@@ -216,9 +216,9 @@ void crearCuenta(){
     }   
     printf("\n\n");
 
-    printf("\t\tListo!\n\tCuenta creada exitosamente.");
+    printf("\t\t Listo!\n\t Cuenta creada exitosamente.");
 
-    printf("\n\n\tENTER para continuar");
+    printf("\n\n\t ENTER para continuar");
     confirmar = getch();
 
     limpiarPantalla();
