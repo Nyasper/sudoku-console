@@ -12,7 +12,15 @@ struct Jugador{
     char nombre[10];
     char usuario[10];
     char contrasena[10];
+    int puntaje;
 };
+
+//Esta estructura es para guardar el estado de los menus
+struct Menu{
+    int posicion;   //Guarda la posicion del jugador en el menu
+    int enter;
+};
+
 
 /*Funciones*/
 
@@ -26,6 +34,10 @@ void crearCuenta();
 //Menu para iniciar sesion
 struct Jugador iniciarSesion();
 
+//Captura el input del usuario y regresa una opcion
+struct Menu mover(int posicion, int inicio, int final);
+
+
 //Limpia la consola
 void limpiarPantalla();
 //Imprime el titulo del juego "Sudoku"
@@ -37,21 +49,27 @@ void imprimirTitulo();
 int main(){
     //Variable para saber si el jugador ya inicio sesion
     int sesion = 0;
+    //Variable para guardar la opcion del jugador
+    int opcion;
 
-    int opcion; //Variable para guardar la opcion del jugador
+    //Mientras no se haya iniciado sesion
+    // while(sesion == 0){
+    //     sesion = sesionMenu();
+    // }
+
 
     opcion = opcionJuego();
     
     //Opcion seleccionada por el jugador
     switch (opcion){
         case 1: //Corresponde a jugar
-            printf("\t   >Jugar      Puntajes      Iniciar sesion\n");
+            printf("\t1   >Jugar      Puntajes      Iniciar sesion\n");
             break;
         case 2: //Corresponde a ver los puntajes
-            printf("\t    Jugar     >Puntajes      Iniciar sesion\n");
+            printf("\t2    Jugar     >Puntajes      Iniciar sesion\n");
             break;
         case 3: //Corresponde a ver las instrucciones
-            printf("\t    Jugar      Puntajes     >Iniciar sesion\n");
+            printf("\t3    Jugar      Puntajes     >Iniciar sesion\n");
             break;
     }
     
@@ -61,27 +79,20 @@ int main(){
 
 int opcionJuego(){
     /*
-    Variable para guardar la posición del menu.
-    Esta tambien es igual a la opcion del jugador.
+    Estructura para saber el estado en que posicion  del menu esta el jugador y para saber si selecciono una opcion.
+    El enter se iguala a 0 para entrar en el while y elegir una opcion.
+    La poscicion se iguala a 1 para iniciar en la primera opcion del menu.
     */
-    int mover = 1;
-
-    
-    /*
-    Variable para saber si el jugador selecciono una opcion.
-    Se inicializa en 0 para que el jugador entre dentro del while
-    y pueda seleccionar una opcion.
-    */
-    int enter = 0;
-
-    char input; //Variable para almacenar la opcion del jugador
+    struct Menu opcion;
+    opcion.enter = 0;
+    opcion.posicion = 1;
 
     //while para elegir la opcion
-    while(enter == 0){
+    while(opcion.enter == 0){
         imprimirTitulo();        
 
         //Imprimir opciones
-        switch(mover){
+        switch(opcion.posicion){
             case 1:
                 printf("\t     >Jugar      Puntajes      %cC%cmo jugar?\n",168,162);
                 break;
@@ -93,34 +104,60 @@ int opcionJuego(){
                 break;
         }
 
-        //Espera el input del jugador
-        input = getch();
-
-        //Acciones para el input del jugador
-        switch(input){
-        case IZQUIERDA:
-            mover--;        //La flechita se mueve a la izquierda
-            if(mover < 1){  //Si ya no puede moverse a la izquierda se va al 3
-                mover = 3;
-            }
-            break;
-        case DERECHA:
-            mover++;        //La flechita se mueve a la derecha
-            if(mover > 3){  //Si ya no puede moverse a la izquierda se va al 1
-                mover = 1;
-            }
-            break;
-        case ENTER:
-            //Termina el menu y la funcion esta lista para retornar la opcion del usuario
-            enter = 1;
-            break;
-        }
+        //Se le pasa como paramtros la posicion actual, el inicio y el final del menu
+        opcion = mover(opcion.posicion, 1, 3);
 
         limpiarPantalla();
     }
 
     //regresa la opcion del jugador
-    return mover;
+    return opcion.posicion;
+}
+
+int sesionMenu(){
+    int sesion = 0;
+
+    imprimirTitulo();
+
+
+    return sesion;
+}
+
+struct Menu mover(int posicion, int inicio, int final){
+    //Es lo que teclea el usuario
+    char input;
+
+    //Estrcura que contiene la posicion y el estado del enter
+    struct Menu estado;
+    estado.posicion = posicion;
+    estado.enter = 0;
+
+    
+    //Espera el input del jugador
+    input = getch();
+
+    //Acciones para el input del jugador
+    //Los if se usan para darle continuidad a las flechitas
+    switch(input){
+    case IZQUIERDA:
+        estado.posicion--;        //La flechita se mueve a la izquierda
+        if(estado.posicion < inicio){  //Si ya no puede moverse a la izquierda se va al fnial
+            estado.posicion = final;
+        }
+        break;
+    case DERECHA:
+        estado.posicion++;        //La flechita se mueve a la derecha
+        if(estado.posicion > final){  //Si ya no puede moverse a la izquierda se va al inicio
+            estado.posicion = inicio;
+        }
+        break;
+
+    case ENTER:
+        estado.enter = 1;
+        break;
+    }
+
+    return estado;
 }
 
 void limpiarPantalla(){
