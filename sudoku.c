@@ -53,9 +53,9 @@ int main(){
     int opcion;
 
     //Mientras no se haya iniciado sesion
-    // while(sesion == 0){
-    //     sesion = sesionMenu();
-    // }
+    while(sesion == 0){
+        sesion = sesionMenu();
+    }
 
 
     opcion = opcionJuego();
@@ -117,8 +117,32 @@ int opcionJuego(){
 int sesionMenu(){
     int sesion = 0;
 
-    imprimirTitulo();
+    /*
+    Estructura para saber el estado en que posicion  del menu esta el jugador y para saber si selecciono una opcion.
+    El enter se iguala a 0 para entrar en el while y elegir una opcion.
+    La poscicion se iguala a 1 para iniciar en la primera opcion del menu.
+    */
+    struct Menu opcion;
+    opcion.enter = 0;
+    opcion.posicion = 1;
 
+    while(opcion.enter == 0){
+        imprimirTitulo();
+        //Opcion seleccionada por el jugador
+        switch (opcion.posicion){
+            case 1: //Corresponde iniciar sesion
+                printf("\t\t>Iniciar Sesion      Crear cuenta\n");
+                break;
+            case 2: //Corresponde a crear una cuenta
+                printf("\t\t Iniciar Sesion     >Crear cuenta\n");
+                break;
+        }
+
+        opcion = mover(opcion.posicion, 1, 2);
+        limpiarPantalla();
+    }
+    
+    sesion = 1;
 
     return sesion;
 }
