@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <windows.h>
 
 //Definir teclas para jugar
 #define ENTER 13
@@ -55,6 +56,8 @@ int main(){
     //Mientras no se haya iniciado sesion
     while(sesion == 0){
         sesion = sesionMenu();
+
+        crearCuenta();
     }
 
 
@@ -77,6 +80,7 @@ int main(){
 }
 /*---------------------------------------------------------------------------------------------------------------------*/
 
+//Funciones para los menus
 int opcionJuego(){
     /*
     Estructura para saber el estado en que posicion  del menu esta el jugador y para saber si selecciono una opcion.
@@ -184,6 +188,43 @@ struct Menu mover(int posicion, int inicio, int final){
     return estado;
 }
 
+//Funciones para la sesion
+void crearCuenta(){
+    int i;
+    //Estructura para guardar los datos del jugador
+    struct Jugador Nuevo;
+
+    //input para confirmar
+    char confirmar;
+
+    printf("\t\tHola bienvenido a Sudoku\n\n");
+    printf("\tIngresa tus datos:\n\n");
+    printf("\tNombre: ");
+    gets(Nuevo.nombre);
+    printf("\tUsuario: ");
+    gets(Nuevo.usuario);
+    printf("\tContrase%ca: ", 164);
+    gets(Nuevo.contrasena);
+
+    //Animacion para procesar
+    limpiarPantalla();
+    //254
+    printf("\n\t\tProcesando...\n\t\t");
+    for(i=0; i<13; i++){
+        printf("%c",254);
+        Sleep(50);
+    }   
+    printf("\n\n");
+
+    printf("\t\tListo!\n\tCuenta creada exitosamente.");
+
+    printf("\n\n\tENTER para continuar");
+    confirmar = getch();
+
+    limpiarPantalla();
+}
+
+//Funciones para imprimir
 void limpiarPantalla(){
     system("CLS");
 }
