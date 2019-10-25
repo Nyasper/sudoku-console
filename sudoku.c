@@ -13,16 +13,35 @@
 int menu();            
 
 //Limpia la consola
-void limpiarPantalla(); 
+void limpiarPantalla();
+//Imprime el titulo del juego "Sudoku"
+void imprimirTitulo(); 
 
+/*-------------------------------------------Funcion main-------------------------------------------------------------*/
 int main(){
+    //Variable para saber si el jugador ya inicio sesion
+    int sesion = 0;
+
     int opcion; //Variable para guardar la opcion del jugador
 
     opcion = menu();
-    printf("\n\nSalio :000  %d\n", opcion);
+    
+    //Opcion seleccionada por el jugador
+    switch (opcion){
+        case 1: //Corresponde a jugar
+            printf("\t   >Jugar      Puntajes      Iniciar sesion\n");
+            break;
+        case 2: //Corresponde a ver los puntajes
+            printf("\t    Jugar     >Puntajes      Iniciar sesion\n");
+            break;
+        case 3: //Corresponde a ver las instrucciones
+            printf("\t    Jugar      Puntajes     >Iniciar sesion\n");
+            break;
+    }
     
     return 0;
 }
+/*---------------------------------------------------------------------------------------------------------------------*/
 
 int menu(){
     /*
@@ -43,24 +62,18 @@ int menu(){
 
     //while para elegir la opcion
     while(enter == 0){
-
-        //imprime un menu con ascii art
-        printf("\t __           _       _       \n");   
-        printf("\t/ _\\_   _  __| | ___ | | ___   _ \n");
-        printf("\t\\ \\| | | |/ _` |/ _ \\| |/ / | | |\n");
-        printf("\t_\\ \\ |_| | (_| | (_) |   <| |_| |\n");
-        printf("\t\\__/\\__,_|\\__,_|\\___/|_|\\_\\__,_|\n\n");
+        imprimirTitulo();        
 
         //Imprimir opciones
         switch(mover){
             case 1:
-                printf("\t>Jugar      Puntajes      Iniciar sesion\n");
+                printf("\t     >Jugar      Puntajes      %cC%cmo jugar?\n",168,162);
                 break;
             case 2:
-                printf("\t Jugar     >Puntajes      Iniciar sesion\n");
+                printf("\t      Jugar     >Puntajes      %cC%cmo jugar?\n",168,162);
                 break;
             case 3:
-                printf("\t Jugar      Puntajes     >Iniciar sesion\n");
+                printf("\t      Jugar      Puntajes     >%cC%cmo jugar?\n",168,162);
                 break;
         }
 
@@ -96,4 +109,13 @@ int menu(){
 
 void limpiarPantalla(){
     system("CLS");
+}
+
+void imprimirTitulo(){
+    //imprime el titulo del juego con ascii art
+    printf("\t\t __           _       _       \n");   
+    printf("\t\t/ _\\_   _  __| | ___ | | ___   _ \n");
+    printf("\t\t\\ \\| | | |/ _` |/ _ \\| |/ / | | |\n");
+    printf("\t\t_\\ \\ |_| | (_| | (_) |   <| |_| |\n");
+    printf("\t\t\\__/\\__,_|\\__,_|\\___/|_|\\_\\__,_|\n\n");
 }
