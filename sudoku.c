@@ -25,18 +25,21 @@ int main(){
 }
 
 int menu(){
-    //Variable para guardar la posición del menu
+    /*
+    Variable para guardar la posición del menu.
+    Esta tambien es igual a la opcion del jugador.
+    */
     int mover = 1;
 
-    //Variable para saber si el jugador selecciono una opcion
+    
     /*
+    Variable para saber si el jugador selecciono una opcion.
     Se inicializa en 0 para que el jugador entre dentro del while
     y pueda seleccionar una opcion.
     */
     int enter = 0;
 
-    //Variable para almacenar la opcion del jugador
-    char opcion;
+    char input; //Variable para almacenar la opcion del jugador
 
     //while para elegir la opcion
     while(enter == 0){
@@ -62,10 +65,10 @@ int menu(){
         }
 
         //Espera el input del jugador
-        opcion = getch();
+        input = getch();
 
         //Acciones para el input del jugador
-        switch (opcion){
+        switch(input){
         case IZQUIERDA:
             mover--;        //La flechita se mueve a la izquierda
             if(mover < 1){  //Si ya no puede moverse a la izquierda se va al 3
