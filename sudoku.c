@@ -7,15 +7,31 @@
 #define ARRIBA 72
 #define ABAJO 80
 
+/*Estructuras*/
+struct Jugador{
+    char nombre[10];
+    char usuario[10];
+    char contrasena[10];
+};
+
 /*Funciones*/
 
-//Imprime el menu de inicio y devuelve el input del jugador
-int menu();            
+//Imprime un menu y regresa la opcion del jugador
+int opcionJuego();            
+
+//Imprime el menu para que el jugador inicie sesion o cree una cuenta
+int sesionMenu();
+//Menu para crear una cuenta
+void crearCuenta();
+//Menu para iniciar sesion
+struct Jugador iniciarSesion();
 
 //Limpia la consola
 void limpiarPantalla();
 //Imprime el titulo del juego "Sudoku"
 void imprimirTitulo(); 
+
+
 
 /*-------------------------------------------Funcion main-------------------------------------------------------------*/
 int main(){
@@ -24,7 +40,7 @@ int main(){
 
     int opcion; //Variable para guardar la opcion del jugador
 
-    opcion = menu();
+    opcion = opcionJuego();
     
     //Opcion seleccionada por el jugador
     switch (opcion){
@@ -43,7 +59,7 @@ int main(){
 }
 /*---------------------------------------------------------------------------------------------------------------------*/
 
-int menu(){
+int opcionJuego(){
     /*
     Variable para guardar la posición del menu.
     Esta tambien es igual a la opcion del jugador.
