@@ -14,6 +14,7 @@ struct Jugador{
     char usuario[10];
     char contrasena[10];
     int puntaje;
+    int sesion;
 };
 
 //Esta estructura es para guardar el estado de los menus
@@ -48,16 +49,26 @@ void imprimirTitulo();
 
 /*-------------------------------------------Funcion main-------------------------------------------------------------*/
 int main(){
-    //Variable para saber si el jugador ya inicio sesion
-    int sesion = 0;
     //Variable para guardar la opcion del jugador
     int opcion;
 
-    //Mientras no se haya iniciado sesion
-    while(sesion == 0){
-        sesion = sesionMenu();
+    //Estructra para guardar los datos del jugador
+    struct Jugador Jugador;
+    Jugador.sesion = 0; //Variable que nos dice si el juagdor inicio sesion
+    
 
-        crearCuenta();
+    //Mientras no se haya iniciado sesion
+    while(Jugador.sesion == 0){
+        opcion = sesionMenu();
+
+        switch(opcion){
+        case 1:             //Corresponde a Iniciar sesion
+            //Jugador = iniciarSesion();
+            break;
+        case 2:             //Corresponde a Crear cuenta
+            crearCuenta();
+            break;
+        }
     }
 
 
@@ -118,39 +129,6 @@ int opcionJuego(){
     return opcion.posicion;
 }
 
-int sesionMenu(){
-    int sesion = 0;
-
-    /*
-    Estructura para saber el estado en que posicion  del menu esta el jugador y para saber si selecciono una opcion.
-    El enter se iguala a 0 para entrar en el while y elegir una opcion.
-    La poscicion se iguala a 1 para iniciar en la primera opcion del menu.
-    */
-    struct Menu opcion;
-    opcion.enter = 0;
-    opcion.posicion = 1;
-
-    while(opcion.enter == 0){
-        imprimirTitulo();
-        //Opcion seleccionada por el jugador
-        switch (opcion.posicion){
-            case 1: //Corresponde iniciar sesion
-                printf("\t\t>Iniciar Sesion      Crear cuenta\n");
-                break;
-            case 2: //Corresponde a crear una cuenta
-                printf("\t\t Iniciar Sesion     >Crear cuenta\n");
-                break;
-        }
-
-        opcion = mover(opcion.posicion, 1, 2);
-        limpiarPantalla();
-    }
-    
-    sesion = 1;
-
-    return sesion;
-}
-
 struct Menu mover(int posicion, int inicio, int final){
     //Es lo que teclea el usuario
     char input;
@@ -189,6 +167,35 @@ struct Menu mover(int posicion, int inicio, int final){
 }
 
 //Funciones para la sesion
+int sesionMenu(){
+    /*
+    Estructura para saber el estado en que posicion  del menu esta el jugador y para saber si selecciono una opcion.
+    El enter se iguala a 0 para entrar en el while y elegir una opcion.
+    La poscicion se iguala a 1 para iniciar en la primera opcion del menu.
+    */
+    struct Menu opcion;
+    opcion.enter = 0;
+    opcion.posicion = 1;
+
+    while(opcion.enter == 0){
+        imprimirTitulo();
+        //Opcion seleccionada por el jugador
+        switch (opcion.posicion){
+            case 1: //Corresponde iniciar sesion
+                printf("\t\t>Iniciar Sesion      Crear cuenta\n");
+                break;
+            case 2: //Corresponde a crear una cuenta
+                printf("\t\t Iniciar Sesion     >Crear cuenta\n");
+                break;
+        }
+
+        opcion = mover(opcion.posicion, 1, 2);
+        limpiarPantalla();
+    }
+
+    return opcion.posicion;
+}
+
 void crearCuenta(){
     int i;
     //Estructura para guardar los datos del jugador
@@ -223,6 +230,8 @@ void crearCuenta(){
 
     limpiarPantalla();
 }
+
+
 
 //Funciones para imprimir
 void limpiarPantalla(){
