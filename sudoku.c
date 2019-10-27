@@ -198,7 +198,7 @@ int sesionMenu(){
                 printf("\t   Iniciar Sesion     >Crear cuenta      Salir\n");
                 break;
             case 3: //Corresponde a salir
-                printf("\t   Iniciar Sesion     >Crear cuenta     >Salir\n");
+                printf("\t   Iniciar Sesion      Crear cuenta     >Salir\n");
                 break;
         }
 
@@ -257,12 +257,12 @@ struct Jugador iniciarSesion(){
                     deNuevo = 0;
                 }
             }
-
+            
             //Si el jugador inicio sesion
             if(Jugador.sesion == 1){
                 limpiarPantalla();
                 printf("\n\tHola %s Bienvenido a Sudoku\n", Jugador.nombre);
-                printf("\n\n\t   Pulsa ENTER para empezar!");
+                printf("\n\n\t Pulsa ENTER para empezar!");
                 char enter;
                 enter = getch();
                 limpiarPantalla();
