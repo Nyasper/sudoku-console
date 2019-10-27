@@ -33,6 +33,8 @@ int opcionJuego();
 int sesionMenu();
 //Menu para crear una cuenta
 void crearCuenta();
+//Esta funcion quita el \n que deja la funcion fgets al leer desde el teclado(Es exclusiva de crearCuenta)
+struct Jugador _quitarDn();
 //Menu para iniciar sesion
 struct Jugador iniciarSesion();
 
@@ -197,41 +199,109 @@ int sesionMenu(){
 }
 
 void crearCuenta(){
+    //Contador para los for
     int i;
     //Estructura para guardar los datos del jugador
     struct Jugador Nuevo;
-
+    //Inicializamos su puntaje del nuevo juagdor en 0
+    Nuevo.puntaje = 0;
     //input para confirmar
     char confirmar;
 
-    printf("\t\tHola bienvenido a Sudoku\n\n");
-    printf("\tIngresa tus datos:\n\n");
-    printf("\tNombre: ");
-    gets(Nuevo.nombre);
-    printf("\tUsuario: ");
-    gets(Nuevo.usuario);
-    printf("\tContrase%ca: ", 164);
-    gets(Nuevo.contrasena);
+    //variable para confirmar si el usuario ingreso los datos correctamente
+    int datosOK = 0;
 
-    //Animacion para procesar
-    limpiarPantalla();
-    //254
-    printf("\n\t\tProcesando...\n\t\t");
-    for(i=0; i<13; i++){
-        printf("%c",254);
-        Sleep(50);
-    }   
-    printf("\n\n");
+    //Abrimos el archivo de usuarios en "a" para agregar
+    FILE * users = fopen(".usuarios.txt", "a");
 
-    printf("\t\t Listo!\n\t Cuenta creada exitosamente.");
+    //Comprobamos si el archivo se abrio correctamente
+    if(users == NULL){
+        printf("\nHubo un error ):");
+        printf("\n\t ENTER para continuar");
+        confirmar = getch();
+        
+        //Se sale del programa
+        exit (-1);
+    }else{
+        //Mientras los datos no se hayan ingresado correctamente
+        while(datosOK == 0){
+            fflush(stdin);
+            printf("\tIngresa tus datos:\n\n");
 
-    printf("\n\n\t ENTER para continuar");
-    confirmar = getch();
 
-    limpiarPantalla();
+            printf("\tNombre: ");
+            fgets(Nuevo.nombre, 10, stdin);
+            fflush(stdin);
+
+            printf("\tUsuario: ");
+            fgets(Nuevo.usuario, 10, stdin);
+            fflush(stdin);
+
+            printf("\tContrase%ca: ", 164);
+            fgets(Nuevo.contrasena, 10, stdin);
+            fflush(stdin);
+
+            //Comprueba si el jugador dejo un espacio vacio
+            if(Nuevo.nombre[0] != '\n' && Nuevo.usuario[0] != '\n' && Nuevo.contrasena[0] != '\n'){
+                datosOK = 1;
+            }else{
+                printf("\n\tERROR: Dejaste algun espacio vacio\n");
+            }
+        }
+        //Quitar los \n
+        Nuevo = _quitarDn(Nuevo);
+
+        //Animacion para procesar
+        limpiarPantalla();
+        //254
+        printf("\n\t\tProcesando...\n\t\t");
+        //Escrbir en el archivo
+        fprintf(users, "%s %s %s %d \n", Nuevo.nombre, Nuevo.usuario, Nuevo.contrasena, Nuevo.puntaje);
+
+        for(i=0; i<13; i++){
+            printf("%c",254);
+            Sleep(20);
+        }   
+        printf("\n\n");
+
+        printf("\t\t Listo!\n\t Cuenta creada exitosamente.");
+
+        //Cerrar el archivo
+        fclose(users);
+
+        printf("\n\n\t ENTER para continuar");
+        confirmar = getch();
+
+        limpiarPantalla();
+    }
 }
 
+struct Jugador _quitarDn(struct Jugador Nuevo){
+    int i;
 
+    //Quita el \n en el nombre
+    for(i=0; i<10; i++){
+        if(Nuevo.nombre[i] == '\n'){
+            Nuevo.nombre[i] = NULL;
+        }
+    }
+
+    //Quita el \n en el usuario
+    for(i=0; i<10; i++){
+        if(Nuevo.usuario[i] == '\n'){
+            Nuevo.usuario[i] = NULL;
+        }
+    }
+    
+    //Quita el \n en la contrasena
+    for(i=0; i<10; i++){
+        if(Nuevo.contrasena[i] == '\n'){
+            Nuevo.contrasena[i] = NULL;
+        }
+    }
+
+    return Nuevo;
+}
 
 //Funciones para imprimir
 void limpiarPantalla(){

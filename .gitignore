@@ -1,5 +1,7 @@
 sudoku.exe
-.vscode/
 pruebasSudoku.c
 pruebasSudoku.exe
-usuarios.txt
+.usuarios.txt
+
+.vscode/
+/Pruebas
