@@ -25,11 +25,10 @@ struct Menu{
     int enter;
 };
 
-
 /*Funciones*/
 
 //Imprime un menu y regresa la opcion del jugador
-int opcionJuego();            
+int juegoMenu(char nombre[10]);            
 
 //Imprime el menu para que el jugador inicie sesion o cree una cuenta
 int sesionMenu();
@@ -61,40 +60,50 @@ int main(){
     //Estructra para guardar los datos del jugador
     struct Jugador Jugador;
     Jugador.sesion = 0; //Variable que nos dice si el juagdor inicio sesion
+
+    //Variable para inicializar el juego
+    int juego = 1;
     
+    while(juego == 1){
+        //Mientras no se haya iniciado sesion y el juego siga activo
+        while(Jugador.sesion == 0 && juego == 1){
+            opcion = sesionMenu();
 
-    //Mientras no se haya iniciado sesion
-    while(Jugador.sesion == 0){
-        opcion = sesionMenu();
-
-        switch(opcion){
-        case 1:             //Corresponde a Iniciar sesion
-            Jugador = iniciarSesion();
-            break;
-        case 2:             //Corresponde a Crear cuenta
-            crearCuenta();
-            break;
-        case 3:             //Corresponde a salir
-            //Se sale del programa
-            exit(-1);
-            break;
+            switch(opcion){
+            case 1:             //Corresponde a Iniciar sesion
+                Jugador = iniciarSesion();
+                break;
+            case 2:             //Corresponde a Crear cuenta
+                crearCuenta();
+                break;
+            case 3:             //Corresponde a salir
+                //Termina el juego y sale
+                juego = 0;
+                break;
+            }
         }
-    }
-
-
-    opcion = opcionJuego();
-    
-    //Opcion seleccionada por el jugador
-    switch (opcion){
-        case 1: //Corresponde a jugar
-            printf("\t1   >Jugar      Puntajes      Iniciar sesion\n");
-            break;
-        case 2: //Corresponde a ver los puntajes
-            printf("\t2    Jugar     >Puntajes      Iniciar sesion\n");
-            break;
-        case 3: //Corresponde a ver las instrucciones
-            printf("\t3    Jugar      Puntajes     >Iniciar sesion\n");
-            break;
+        //Si el jugador inicio sesion y si el juego sigue activo
+        if(Jugador.sesion == 1 && juego == 1){
+            opcion = juegoMenu(Jugador.nombre);
+        
+            //Opcion seleccionada por el jugador
+            switch (opcion){
+                case 1: //Corresponde a jugar
+                    printf("\tJuego Sudoku\n");
+                    break;
+                case 2: //Corresponde a ver los puntajes
+                    printf("\tLista de puntajes\n");
+                    break;
+                case 3: //Corresponde a ver las instrucciones
+                    printf("\tInstrucciones\n");
+                    break;
+                case 4: //Corresponde a ver las instrucciones
+                    printf("\tSesion cerrada\n");
+                    //Cierra la sesion del jugador
+                    Jugador.sesion = 0;
+                    break;
+            }
+        }
     }
     
     return 0;
@@ -102,7 +111,7 @@ int main(){
 /*---------------------------------------------------------------------------------------------------------------------*/
 
 /*Funciones para los menus*/
-int opcionJuego(){
+int juegoMenu(char nombre[10]){
     /*
     Estructura para saber el estado en que posicion  del menu esta el jugador y para saber si selecciono una opcion.
     El enter se iguala a 0 para entrar en el while y elegir una opcion.
@@ -114,23 +123,27 @@ int opcionJuego(){
 
     //while para elegir la opcion
     while(opcion.enter == 0){
+        printf("\n\tJugador: %s\n", nombre);
         imprimirTitulo();        
 
         //Imprimir opciones
         switch(opcion.posicion){
             case 1:
-                printf("\t     >Jugar      Puntajes      %cC%cmo jugar?\n",168,162);
+                printf("\t>Jugar    Puntajes    %cC%cmo jugar?    Cerrar sesion\n",168,162);
                 break;
             case 2:
-                printf("\t      Jugar     >Puntajes      %cC%cmo jugar?\n",168,162);
+                printf("\t Jugar   >Puntajes    %cC%cmo jugar?    Cerrar sesion\n",168,162);
                 break;
             case 3:
-                printf("\t      Jugar      Puntajes     >%cC%cmo jugar?\n",168,162);
+                printf("\t Jugar    Puntajes   >%cC%cmo jugar?    Cerrar sesion\n",168,162);
+                break;
+            case 4:
+                printf("\t Jugar    Puntajes    %cC%cmo jugar?   >Cerrar sesion\n",168,162);
                 break;
         }
 
         //Se le pasa como paramtros la posicion actual, el inicio y el final del menu
-        opcion = mover(opcion.posicion, 1, 3);
+        opcion = mover(opcion.posicion, 1, 4);
 
         limpiarPantalla();
     }
