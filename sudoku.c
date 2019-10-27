@@ -19,7 +19,9 @@ struct Jugador{
 
 //Esta estructura es para guardar el estado de los menus
 struct Menu{
-    int posicion;   //Guarda la posicion del jugador en el menu
+    //Guarda la posicion del jugador en el menu
+    int posicion;   
+    //Es para saber si el jugador selecciono una opcion
     int enter;
 };
 
@@ -33,10 +35,12 @@ int opcionJuego();
 int sesionMenu();
 //Menu para crear una cuenta
 void crearCuenta();
-//Esta funcion quita el \n que deja la funcion fgets al leer desde el teclado(Es exclusiva de crearCuenta)
+//Esta funcion quita el \n que deja la funcion fgets al leer desde el teclado
 struct Jugador _quitarDn();
 //Menu para iniciar sesion
 struct Jugador iniciarSesion();
+//Funcion pora los errores del sistema de ususarios
+void _errorSistemaDeUsuarios();
 
 //Captura el input del usuario y regresa una opcion
 struct Menu mover(int posicion, int inicio, int final);
@@ -65,10 +69,14 @@ int main(){
 
         switch(opcion){
         case 1:             //Corresponde a Iniciar sesion
-            //Jugador = iniciarSesion();
+            Jugador = iniciarSesion();
             break;
         case 2:             //Corresponde a Crear cuenta
             crearCuenta();
+            break;
+        case 3:             //Corresponde a salir
+            //Se sale del programa
+            exit(-1);
             break;
         }
     }
@@ -93,7 +101,7 @@ int main(){
 }
 /*---------------------------------------------------------------------------------------------------------------------*/
 
-//Funciones para los menus
+/*Funciones para los menus*/
 int opcionJuego(){
     /*
     Estructura para saber el estado en que posicion  del menu esta el jugador y para saber si selecciono una opcion.
@@ -168,7 +176,7 @@ struct Menu mover(int posicion, int inicio, int final){
     return estado;
 }
 
-//Funciones para la sesion
+/*Funciones para la sesion*/
 int sesionMenu(){
     /*
     Estructura para saber el estado en que posicion  del menu esta el jugador y para saber si selecciono una opcion.
@@ -184,18 +192,106 @@ int sesionMenu(){
         //Opcion seleccionada por el jugador
         switch (opcion.posicion){
             case 1: //Corresponde iniciar sesion
-                printf("\t\t>Iniciar Sesion      Crear cuenta\n");
+                printf("\t  >Iniciar Sesion      Crear cuenta      Salir\n");
                 break;
             case 2: //Corresponde a crear una cuenta
-                printf("\t\t Iniciar Sesion     >Crear cuenta\n");
+                printf("\t   Iniciar Sesion     >Crear cuenta      Salir\n");
+                break;
+            case 3: //Corresponde a salir
+                printf("\t   Iniciar Sesion     >Crear cuenta     >Salir\n");
                 break;
         }
 
-        opcion = mover(opcion.posicion, 1, 2);
+        opcion = mover(opcion.posicion, 1, 3);
         limpiarPantalla();
     }
 
     return opcion.posicion;
+}
+
+struct Jugador iniciarSesion(){
+    //Estructura que va a almacenar al jugador
+    struct Jugador Jugador;
+
+    //Estructura que va a almacenar los datos que ingrese el usuario para iniciar sesion
+    struct Jugador Login;
+
+    //Variable para abrir el archhivo de usuarios en modo lectura
+    FILE * usuarios = fopen(".usuarios.txt", "r");
+
+    //Comprobar si el archivo se abrio correctamente
+    if(usuarios == NULL){
+        _errorSistemaDeUsuarios();
+    }else{
+        //Variable para saber si el juagdor quiere poner de nuevo el usuario y contrasena
+        int deNuevo = 1;
+
+        while(deNuevo == 1){
+            limpiarPantalla();
+            printf("\n\t\tIniciar sesion\n\n");
+
+            //Ingresa datos del usuario y limpia el buffer con fflush
+            fflush(stdin);
+            printf("\tUsuario: ");
+            fgets(Login.usuario, 10, stdin);
+            fflush(stdin);
+
+            printf("\tContrase%ca: ", 164);
+            fgets(Login.contrasena, 10, stdin);
+            fflush(stdin);
+
+            //Quitar los \n
+            Login = _quitarDn(Login);
+
+            //Variable para saber si los usuarios coninciden
+            int encontrado = 0;
+            //while para iterar entre todos los usuarios de la base de datos para saber si alguno conincide
+            while(feof(usuarios) == 0 && encontrado == 0){
+                fscanf(usuarios, "%s %s %s %d %d", Jugador.nombre, Jugador.usuario, Jugador.contrasena, &Jugador.puntaje, &Jugador.sesion);
+
+                //Si el usuario y contrasena coincide con alguno de la base de datos .txt
+                if(strcmp(Jugador.usuario, Login.usuario) == 0 && strcmp(Jugador.contrasena, Login.contrasena) == 0){
+                    //El usuario ha iniciado sesion
+                    Jugador.sesion = 1;
+                    encontrado = 1;
+                    deNuevo = 0;
+                }
+            }
+
+            //Si el jugador inicio sesion
+            if(Jugador.sesion == 1){
+                limpiarPantalla();
+                printf("\n\tHola %s Bienvenido a Sudoku\n", Jugador.nombre);
+                printf("\n\n\t   Pulsa ENTER para empezar!");
+                char enter;
+                enter = getch();
+                limpiarPantalla();
+            }else{
+                //Estructura para moverse en el menu de usuario y contrasena incorrecto
+                struct Menu opcion;
+                opcion.posicion = 1;
+                opcion.enter = 0;
+
+                //Menu para intentar otra vez o regresar al menu de inicio
+                while(opcion.enter == 0){
+                    limpiarPantalla();
+                    printf("\n\n\tUsuario o contrase%ca incorrecto.\n", 164);
+                    switch (opcion.posicion){
+                    case 1:
+                        printf("\n  >Intentar de nuevo    Regresar");
+                        break;
+                    
+                    case 2:
+                        printf("\n   Intentar de nuevo   >Regresar");
+                        break;
+                    }
+                    opcion = mover(opcion.posicion, 1, 2);
+                }   
+            }
+        }////fin while
+	}
+
+    return Jugador;
 }
 
 void crearCuenta(){
@@ -205,6 +301,8 @@ void crearCuenta(){
     struct Jugador Nuevo;
     //Inicializamos su puntaje del nuevo juagdor en 0
     Nuevo.puntaje = 0;
+    //Dejamos su sesion del nuevo jugador cerrada
+    Nuevo.sesion = 0;
     //input para confirmar
     char confirmar;
 
@@ -216,12 +314,7 @@ void crearCuenta(){
 
     //Comprobamos si el archivo se abrio correctamente
     if(users == NULL){
-        printf("\nHubo un error ):");
-        printf("\n\t ENTER para continuar");
-        confirmar = getch();
-        
-        //Se sale del programa
-        exit (-1);
+        _errorSistemaDeUsuarios();
     }else{
         //Mientras los datos no se hayan ingresado correctamente
         while(datosOK == 0){
@@ -256,7 +349,7 @@ void crearCuenta(){
         //254
         printf("\n\t\tProcesando...\n\t\t");
         //Escrbir en el archivo
-        fprintf(users, "%s %s %s %d \n", Nuevo.nombre, Nuevo.usuario, Nuevo.contrasena, Nuevo.puntaje);
+        fprintf(users, "%s %s %s %d %d\n", Nuevo.nombre, Nuevo.usuario, Nuevo.contrasena, Nuevo.puntaje, Nuevo.sesion);
 
         for(i=0; i<13; i++){
             printf("%c",254);
@@ -303,7 +396,19 @@ struct Jugador _quitarDn(struct Jugador Nuevo){
     return Nuevo;
 }
 
-//Funciones para imprimir
+void _errorSistemaDeUsuarios(){
+    //input para confirmar
+    char confirmar;
+
+    printf("\nERROR: No se pudo acceder a al sistema de usuarios");
+    printf("\n\t ENTER para continuar");
+    confirmar = getch();
+        
+    //Se sale del programa
+     exit (-1);
+}
+
+/*Funciones para imprimir*/
 void limpiarPantalla(){
     system("CLS");
 }
