@@ -308,6 +308,24 @@ struct Jugador iniciarSesion(){
                     deNuevo = 0;
                 }
             }
+            limpiarPantalla();
+            //Animacion de iniciando sesion
+            int cont2, cont;
+            for (cont2 = 1; cont2 <= 4; cont2++){
+                for (cont = 0;cont<4;cont++){
+                    printf("\n\n\t\tIniciando sesion ");
+                    if (cont == 0)
+                        printf("\\\n\n");
+                    if (cont == 1)
+                        printf("|\n\n");
+                    if (cont == 2)
+                        printf("/\n\n");
+                    if (cont == 3)
+                        printf("%c\n\n", 196);
+                    Sleep(20);
+                    limpiarPantalla();
+                }
+            }
             
             //Si el jugador inicio sesion
             if(Jugador.sesion == 1){
@@ -318,6 +336,7 @@ struct Jugador iniciarSesion(){
                 enter = getch();
                 limpiarPantalla();
             }else{
+                limpiarPantalla();
                 //Estructura para moverse en el menu de usuario y contrasena incorrecto
                 struct Menu opcion;
                 opcion.posicion = 1;
@@ -325,18 +344,20 @@ struct Jugador iniciarSesion(){
 
                 //Menu para intentar otra vez o regresar al menu de inicio
                 while(opcion.enter == 0){
-                    limpiarPantalla();
                     printf("\n\n\tUsuario o contrase%ca incorrecto.\n", 164);
                     switch (opcion.posicion){
                     case 1:
-                        printf("\n  >Intentar de nuevo    Regresar");
+                        printf("\n\t>Intentar de nuevo    Regresar\n\n");
+                        deNuevo = 1;
                         break;
                     
                     case 2:
-                        printf("\n   Intentar de nuevo   >Regresar");
+                        printf("\n\t Intentar de nuevo   >Regresar\n\n");
+                        deNuevo = 0;
                         break;
                     }
                     opcion = mover(opcion.posicion, 1, 2);
+                    limpiarPantalla();
                 }   
             }
         }////fin while
