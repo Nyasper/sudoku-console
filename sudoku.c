@@ -64,17 +64,20 @@ void imprimirTitulo();
 //Funcion que inicia el juego (void temporal)
 void jugarSudoku();
 
-//Estructura para almacenar coordenadas del tablero de juego
-struct XY_tablero{
+//Estructura para almacenar coordenadas del tablero de juego y los inputs del jugador
+struct XYN_tablero{
     int x;
     int y;
-    int enter;
+    //Variable que va a guardar lo que presione el jugador
+    char input;
+    //Varible para guardar el numero dijitado por el jugador
+    int numero;
 };
 
 //Estructura para almacenar las propiedades de cada casilla
 struct Casilla{
     //Almacena un valor numerico en forma de caracter del 1 al 9 de la casilla para jugar
-    char valor;
+    int valor;
     //Variable binaria que nos dice si la casilla se puede modificar 0=NO 1=SI
     int modificable;
     //Cadena de caracteres que se va a imprimir en pantalla
@@ -84,8 +87,8 @@ struct Casilla{
     int y;
 };
 
-//funcion que permite identicar las flechas del teclado para moverse entre las casillas del tablero
-struct XY_tablero moverse_en_tablero(struct XY_tablero posicion);
+//funcion para moverse en el tablero de juego y para colocar el numero que usuario eligio para poner en casilla
+struct XYN_tablero jugar_en_tablero(struct XYN_tablero posicion);
 
 //Pide un numero para llenar la casilla seleccionada
 char llenarCasilla();
@@ -510,11 +513,10 @@ void imprimirTitulo(){
 
 void jugarSudoku(){
     //Estructura que almacena la posicion del jugador en el tablero del suidoku (x, y)
-    struct XY_tablero posicionJugador;
+    struct XYN_tablero posicionJugador;
     //Se inicializan la posicion del jugador en (0, 0) y con enter = 0
     posicionJugador.x = 0;
     posicionJugador.y = 0;
-    posicionJugador.enter = 0;
 
     //Se crea el tablero
     struct Tablero TABLERO;
@@ -543,7 +545,11 @@ void jugarSudoku(){
                     printf(" %c %c", 254, TABLERO.xy[x][y].imprimir);
                 }else{
                     //Imprime el caracter correspondiente a la coordenada x, y
-                    printf(" %c %c",TABLERO.xy[x][y].valor ,TABLERO.xy[x][y].imprimir);
+                    if(TABLERO.xy[x][y].valor == 0){
+                        printf("   %c", TABLERO.xy[x][y].imprimir);
+                    }else{
+                        printf(" %d %c",TABLERO.xy[x][y].valor ,TABLERO.xy[x][y].imprimir);
+                    }
                 }
                 
 
@@ -567,72 +573,92 @@ void jugarSudoku(){
         }else{
             printf("\n\n\t\t\t Salir\n\n");
         }
-        posicionJugador = moverse_en_tablero(posicionJugador);
+        posicionJugador = jugar_en_tablero(posicionJugador);
 
-        //Si se presiono enter
-        if(posicionJugador.enter == 1){
-            switch (posicionJugador.y){
-            case 9:         //Corresponde a terminar el juego
-                juego = 0;
-                break;
-
-            default:        //Corresponde a llenar casilla
-                //Llena la casilla seleccionada con un numero que va a dijitar el usuario
-                TABLERO.xy[posicionJugador.x][posicionJugador.y].valor = llenarCasilla();
-                break;
-            }
+        //Si se presiono enter seleccionando la opcion de salir
+        if(posicionJugador.input == ENTER && posicionJugador.y == 9){
+            //Se termina el juego
+            juego = 0;
         }
-        
-        //Enter valor a falso para seguir llenando mas casillas
-        posicionJugador.enter = 0;
-        system("CLS"); 
+        //Si se presiona algun numero cambia el valor de la casilla
+        if(posicionJugador.numero != 0){
+            TABLERO.xy[posicionJugador.x][posicionJugador.y].valor = posicionJugador.numero;
+        }
+
+
+        limpiarPantalla();
     }
 }
 
-struct XY_tablero moverse_en_tablero(struct XY_tablero posicion){
-    //Input del teclado del usuario
-    char input;
-
+struct XYN_tablero jugar_en_tablero(struct XYN_tablero jugadorXYN){
     //Leer input
-    input = getch();
+    jugadorXYN.input = getch();
+    //Se inicializa el valor del numero para la casilla en 0
+    jugadorXYN.numero = 0;
 
+    switch (jugadorXYN.input){
     //Se suman o se restan posiciones dependiendo la tecla que se presione
-    switch (input){
+    //Casos para moverse en el tablero
     case ARRIBA:           
-        posicion.y--; 
+        jugadorXYN.y--; 
 
-        if(posicion.y < 0){
-            posicion.y = 8;
+        if(jugadorXYN.y < 0){
+            jugadorXYN.y = 8;
         }
         break;
     case ABAJO:
-        posicion.y++;
+        jugadorXYN.y++;
 
-        if(posicion.y > 9){
-            posicion.y = 0;
+        if(jugadorXYN.y > 9){
+            jugadorXYN.y = 0;
         }
         break;
     case DERECHA:
-        posicion.x++;
+        jugadorXYN.x++;
 
-        if(posicion.x > 8){
-            posicion.x = 0;
+        if(jugadorXYN.x > 8){
+            jugadorXYN.x = 0;
         }
         break;
     case IZQUIERDA:
-        posicion.x--;
+        jugadorXYN.x--;
 
-        if(posicion.x < 0){
-            posicion.x = 8;
+        if(jugadorXYN.x < 0){
+            jugadorXYN.x = 8;
         }
         break;
 
-    case ENTER:
-        posicion.enter = 1;
+    //Casos para dijitar un numero
+    case N1:
+        jugadorXYN.numero = 1;
+        break;
+    case N2:
+        jugadorXYN.numero = 2;
+        break;
+    case N3:
+        jugadorXYN.numero = 3;
+        break;
+    case N4:
+        jugadorXYN.numero = 4;
+        break;
+    case N5:
+        jugadorXYN.numero = 5;
+        break;
+    case N6:
+        jugadorXYN.numero = 6;
+        break;
+    case N7:
+        jugadorXYN.numero = 7;
+        break;
+    case N8:
+        jugadorXYN.numero = 8;
+        break;
+    case N9:
+        jugadorXYN.numero = 9;
         break;
     }
 
-    return posicion;
+    return jugadorXYN;
 }
 
 struct Tablero crearCasillas(){
@@ -649,7 +675,7 @@ struct Tablero crearCasillas(){
         //for para darle valores a x
         for(x=0; x<9; x++){
             //Le da un valor vacio a la casilla
-            TABLERO.xy[x][y].valor = ' ';
+            TABLERO.xy[x][y].valor = 0;
             if(x < 8){
                 TABLERO.xy[x][y].imprimir = '|';
             }else{
@@ -659,33 +685,4 @@ struct Tablero crearCasillas(){
     }
 
     return TABLERO;
-}
-
-char llenarCasilla(){
-    //Va a recibir un numero y lo va a trasformar a char para regresarlo para que entre en una casilla
-    char numero;
-
-    //Numero que va a digitar el jugador
-    int n;
-
-    do{
-        //Llenamos la casilla seleccionadfa con un numero del 1 al 9 que dijite el usuario
-        printf("\n\t\tNumero (1 al 9): ");
-        //Si el usuario digita una letra se convierte a entero para evitar bugs
-        if (scanf("%d", &n) != 1) {
-        n = 0;
-        /* Limpia el buffer del stdin (Evita el ciclo infinito) */
-        while (getchar() != '\n');
-        }
-
-        if(n < 1 || n > 9){
-            printf("\tERROR: Solo se permiten numeros del 1 al 9");
-        }
-
-    }while(n < 1 || n > 9);
-
-    //Convertimos el numero a caracter
-    numero = (char) (n + '0');
-
-    return numero;
 }
