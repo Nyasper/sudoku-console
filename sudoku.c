@@ -1,11 +1,22 @@
 #include <stdio.h>
 
-//Definir teclas para jugar
+//Teclas para moverse en los menus y en el tablero de juego
 #define ENTER 13
 #define IZQUIERDA 75
 #define DERECHA 77
 #define ARRIBA 72
 #define ABAJO 80
+
+//Teclas para dijitar los numeros
+#define N1 49
+#define N2 50
+#define N3 51
+#define N4 52
+#define N5 53
+#define N6 54
+#define N7 55
+#define N8 56
+#define N9 57
 
 /*Estructuras*/
 struct Jugador{
