@@ -52,6 +52,8 @@ int _comprobarEspacios(struct Jugador Nuevo);
 struct Jugador iniciarSesion();
 //Funcion para los errores del sistema de usuarios
 void _errorSistemaDeUsuarios();
+//Funcion que hace un menu para regresar o regresar a otro menu en dado caso de que haya un error en el sistema de usuarios, recibe un codigo de error
+int menu_IntentarDeNuevo(int error);
 
 //Captura el input del usuario y regresa una opcion
 struct Menu mover(int posicion, int inicio, int final);
@@ -353,33 +355,54 @@ struct Jugador iniciarSesion(){
                 limpiarPantalla();
             }else{
                 limpiarPantalla();
-                //Estructura para moverse en el menu de usuario y contrasena incorrecto
-                struct Menu opcion;
-                opcion.posicion = 1;
-                opcion.enter = 0;
-
-                //Menu para intentar otra vez o regresar al menu de inicio
-                while(opcion.enter == 0){
-                    printf("\n\n\tUsuario o contrase%ca incorrecto.\n", 164);
-                    switch (opcion.posicion){
-                    case 1:
-                        printf("\n\t>Intentar de nuevo    Regresar\n\n");
-                        deNuevo = 1;
-                        break;
-                    
-                    case 2:
-                        printf("\n\t Intentar de nuevo   >Regresar\n\n");
-                        deNuevo = 0;
-                        break;
-                    }
-                    opcion = mover(opcion.posicion, 1, 2);
-                    limpiarPantalla();
-                }   
+                
+                deNuevo = menu_IntentarDeNuevo(0);
             }
         }////fin while
 	}
 
     return Jugador;
+}
+
+int menu_IntentarDeNuevo(int error){
+    int bandera;
+
+    //Estructura para moverse en el menu de intentar de nuevo o regresar
+    struct Menu opcion;
+    opcion.posicion = 1;
+    opcion.enter = 0;
+
+    //Menu para intentar otra vez o regresar al menu de inicio
+    while(opcion.enter == 0){
+        switch (error){
+        case 0: //Error de la funcion iniciarSesion()
+            printf("\n\n\tUsuario o contrase%ca incorrecto.\n", 164);
+            break;
+        
+        case 1: //Error de la funcion crearCuenta()
+            printf("\n\tERROR: Pusiste algun espacio en la contrase%ca, nombre o usuario.\n\n", 164);
+            break;
+        case 2: //Error de la funcion crearCuenta()
+            printf("\n\tERROR: Dejaste algun espacio vacio\n\n");
+            break;
+        }
+        
+        switch (opcion.posicion){
+        case 1:
+            printf("\n\t>Intentar de nuevo    Regresar\n\n");
+            bandera = 1;
+            break;
+        
+        case 2:
+            printf("\n\t Intentar de nuevo   >Regresar\n\n");
+            bandera = 0;
+            break;
+        }
+        opcion = mover(opcion.posicion, 1, 2);
+        limpiarPantalla();
+    }
+
+    return bandera;
 }
 
 void crearCuenta(){
@@ -406,12 +429,15 @@ void crearCuenta(){
     if(users == NULL){
         _errorSistemaDeUsuarios();
     }else{
+
+        //Varieble para saber si el usuario quiere intentarlo de nuevo
+        int deNuevo = 1;
         printf("\tCREA TU CUENTA DE SUDOKU\n\n");
         //Crea una funcion de tipo void para imprimir las indicaciones
 
 
         //Mientras los datos no se hayan ingresado correctamente
-        while(datosOK == 0){
+        while(datosOK == 0 && deNuevo == 1){
             fflush(stdin);
             printf("\tIngresa tus datos:\n\n");
 
@@ -434,40 +460,46 @@ void crearCuenta(){
             //Comprueba si el jugador dejo un espacio vacio y que sus datos no tengan espacios
             if(Nuevo.nombre[0] != '\n' && Nuevo.usuario[0] != '\n' && Nuevo.contrasena[0] != '\n' && espacios == 0){
                 datosOK = 1;
+                deNuevo = 0;
             }else{
+                limpiarPantalla();
                 if(espacios == 1){
-                    printf("\n\t    ERROR: Pusiste algun espacio en la contrase%ca, nombre o usuario.\n\n");
+                    deNuevo = menu_IntentarDeNuevo(1);
                 }else{
-                printf("\n\t    ERROR: Dejaste algun espacio vacio\n\n");
+                    deNuevo = menu_IntentarDeNuevo(2);
                 }
             }
         }
 
-        //Animacion para procesar
-        limpiarPantalla();
-        //254
-        printf("\n\t\tProcesando...\n\t\t");
-        //Quitar los \n
-        Nuevo = _quitarDn(Nuevo);
+        //Si los datos estan bien crea la cuenta
+        if(datosOK == 1){
+            //Animacion para procesar
+            limpiarPantalla();
+            //254
+            printf("\n\t\tProcesando...\n\t\t");
+            //Quitar los \n
+            Nuevo = _quitarDn(Nuevo);
 
-        //Escrbir en el archivo
-        fprintf(users, "%s %s %s %d %d\n", Nuevo.nombre, Nuevo.usuario, Nuevo.contrasena, Nuevo.puntaje, Nuevo.sesion);
+            //Escrbir en el archivo
+            fprintf(users, "%s %s %s %d %d\n", Nuevo.nombre, Nuevo.usuario, Nuevo.contrasena, Nuevo.puntaje, Nuevo.sesion);
 
-        for(i=0; i<13; i++){
-            printf("%c",254);
-            Sleep(20);
-        }   
-        printf("\n\n");
+            for(i=0; i<13; i++){
+                printf("%c",254);
+                Sleep(20);
+            }   
+            printf("\n\n");
 
-        printf("\t\t Listo!\n\t Cuenta creada exitosamente.");
+            printf("\t\t Listo!\n\t Cuenta creada exitosamente.");
 
-        //Cerrar el archivo
-        fclose(users);
+            //Cerrar el archivo
+            fclose(users);
 
-        printf("\n\n\t ENTER para continuar");
-        confirmar = getch();
+            printf("\n\n\t ENTER para continuar");
+            confirmar = getch();
 
-        limpiarPantalla();
+            limpiarPantalla();
+        }
+
     }
 }
 
