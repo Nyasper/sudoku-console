@@ -46,6 +46,8 @@ int sesionMenu();
 void crearCuenta();
 //Esta funcion quita el \n que deja la funcion fgets al leer desde el teclado
 struct Jugador _quitarDn();
+//Comprueba si el jugador uso un espacio para alguno de sus datos
+int _comprobarEspacios(struct Jugador Nuevo);
 //Menu para iniciar sesion
 struct Jugador iniciarSesion();
 //Funcion para los errores del sistema de usuarios
@@ -394,6 +396,8 @@ void crearCuenta(){
 
     //variable para confirmar si el usuario ingreso los datos correctamente
     int datosOK = 0;
+    //variable para saber si el usuario no ingreso espacios
+    int espacios = 1;
 
     //Abrimos el archivo de usuarios en "a" para agregar
     FILE * users = fopen(".usuarios.txt", "a");
@@ -402,6 +406,10 @@ void crearCuenta(){
     if(users == NULL){
         _errorSistemaDeUsuarios();
     }else{
+        printf("\tCREA TU CUENTA DE SUDOKU\n\n");
+        //Crea una funcion de tipo void para imprimir las indicaciones
+
+
         //Mientras los datos no se hayan ingresado correctamente
         while(datosOK == 0){
             fflush(stdin);
@@ -420,20 +428,28 @@ void crearCuenta(){
             fgets(Nuevo.contrasena, 10, stdin);
             fflush(stdin);
 
-            //Comprueba si el jugador dejo un espacio vacio
-            if(Nuevo.nombre[0] != '\n' && Nuevo.usuario[0] != '\n' && Nuevo.contrasena[0] != '\n'){
+            //Comprobar si dejaron un espacio
+            espacios = _comprobarEspacios(Nuevo);
+
+            //Comprueba si el jugador dejo un espacio vacio y que sus datos no tengan espacios
+            if(Nuevo.nombre[0] != '\n' && Nuevo.usuario[0] != '\n' && Nuevo.contrasena[0] != '\n' && espacios == 0){
                 datosOK = 1;
             }else{
-                printf("\n\tERROR: Dejaste algun espacio vacio\n");
+                if(espacios == 1){
+                    printf("\n\t    ERROR: Pusiste algun espacio en la contrase%ca, nombre o usuario.\n\n");
+                }else{
+                printf("\n\t    ERROR: Dejaste algun espacio vacio\n\n");
+                }
             }
         }
-        //Quitar los \n
-        Nuevo = _quitarDn(Nuevo);
 
         //Animacion para procesar
         limpiarPantalla();
         //254
         printf("\n\t\tProcesando...\n\t\t");
+        //Quitar los \n
+        Nuevo = _quitarDn(Nuevo);
+
         //Escrbir en el archivo
         fprintf(users, "%s %s %s %d %d\n", Nuevo.nombre, Nuevo.usuario, Nuevo.contrasena, Nuevo.puntaje, Nuevo.sesion);
 
@@ -454,6 +470,20 @@ void crearCuenta(){
         limpiarPantalla();
     }
 }
+
+int _comprobarEspacios(struct Jugador Nuevo){
+    int espacios = 0;
+
+    int i;
+    for(i=0; i<10; i++){
+        if(Nuevo.nombre[i] == ' ' || Nuevo.contrasena[i] == ' ' || Nuevo.usuario[i] == ' '){
+            espacios = 1;
+        }
+    }
+
+    return espacios;
+}
+
 
 struct Jugador _quitarDn(struct Jugador Nuevo){
     int i;
