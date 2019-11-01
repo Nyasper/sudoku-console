@@ -45,9 +45,9 @@ int sesionMenu();
 //Menu para crear una cuenta
 void crearCuenta();
 //Esta funcion quita el \n que deja la funcion fgets al leer desde el teclado
-struct Jugador _quitarDn();
+void _quitarDn(struct Jugador *Nuevo);
 //Comprueba si el jugador uso un espacio para alguno de sus datos
-int _comprobarEspacios(struct Jugador Nuevo);
+int _comprobarEspacios(struct Jugador *Nuevo);
 //Menu para iniciar sesion
 struct Jugador iniciarSesion();
 //Funcion para los errores del sistema de usuarios
@@ -92,7 +92,7 @@ struct Casilla{
 };
 
 //funcion para moverse en el tablero de juego y para colocar el numero que usuario eligio para poner en casilla
-struct XYN_tablero jugar_en_tablero(struct XYN_tablero posicion);
+void jugar_en_tablero(struct XYN_tablero *posicion);
 
 //Pide un numero para llenar la casilla seleccionada
 char llenarCasilla();
@@ -310,7 +310,7 @@ struct Jugador iniciarSesion(){
             fflush(stdin);
 
             //Quitar los \n
-            Login = _quitarDn(Login);
+            _quitarDn(&Login);
 
             //Variable para saber si los usuarios coninciden
             int encontrado = 0;
@@ -455,7 +455,7 @@ void crearCuenta(){
             fflush(stdin);
 
             //Comprobar si dejaron un espacio
-            espacios = _comprobarEspacios(Nuevo);
+            espacios = _comprobarEspacios(&Nuevo);
 
             //Comprueba si el jugador dejo un espacio vacio y que sus datos no tengan espacios
             if(Nuevo.nombre[0] != '\n' && Nuevo.usuario[0] != '\n' && Nuevo.contrasena[0] != '\n' && espacios == 0){
@@ -478,7 +478,7 @@ void crearCuenta(){
             //254
             printf("\n\t\tProcesando...\n\t\t");
             //Quitar los \n
-            Nuevo = _quitarDn(Nuevo);
+            _quitarDn(&Nuevo);
 
             //Escrbir en el archivo
             fprintf(users, "%s %s %s %d %d\n", Nuevo.nombre, Nuevo.usuario, Nuevo.contrasena, Nuevo.puntaje, Nuevo.sesion);
@@ -503,12 +503,12 @@ void crearCuenta(){
     }
 }
 
-int _comprobarEspacios(struct Jugador Nuevo){
+int _comprobarEspacios(struct Jugador *Nuevo){
     int espacios = 0;
 
     int i;
     for(i=0; i<10; i++){
-        if(Nuevo.nombre[i] == ' ' || Nuevo.contrasena[i] == ' ' || Nuevo.usuario[i] == ' '){
+        if(Nuevo->nombre[i] == ' ' || Nuevo->contrasena[i] == ' ' || Nuevo->usuario[i] == ' '){
             espacios = 1;
         }
     }
@@ -517,31 +517,29 @@ int _comprobarEspacios(struct Jugador Nuevo){
 }
 
 
-struct Jugador _quitarDn(struct Jugador Nuevo){
+void _quitarDn(struct Jugador *Nuevo){
     int i;
 
     //Quita el \n en el nombre
     for(i=0; i<10; i++){
-        if(Nuevo.nombre[i] == '\n'){
-            Nuevo.nombre[i] = NULL;
+        if(Nuevo->nombre[i] == '\n'){
+            Nuevo->nombre[i] = NULL;
         }
     }
 
     //Quita el \n en el usuario
     for(i=0; i<10; i++){
-        if(Nuevo.usuario[i] == '\n'){
-            Nuevo.usuario[i] = NULL;
+        if(Nuevo->usuario[i] == '\n'){
+            Nuevo->usuario[i] = NULL;
         }
     }
     
     //Quita el \n en la contrasena
     for(i=0; i<10; i++){
-        if(Nuevo.contrasena[i] == '\n'){
-            Nuevo.contrasena[i] = NULL;
+        if(Nuevo->contrasena[i] == '\n'){
+            Nuevo->contrasena[i] = NULL;
         }
     }
-
-    return Nuevo;
 }
 
 void _errorSistemaDeUsuarios(){
@@ -635,7 +633,8 @@ void jugarSudoku(){
         }else{
             printf("\n\n\t\t\t Salir\n\n");
         }
-        posicionJugador = jugar_en_tablero(posicionJugador);
+        
+        jugar_en_tablero(&posicionJugador);
 
         //Si se presiono enter seleccionando la opcion de salir
         if(posicionJugador.input == ENTER && posicionJugador.y == 9){
@@ -652,75 +651,73 @@ void jugarSudoku(){
     }
 }
 
-struct XYN_tablero jugar_en_tablero(struct XYN_tablero jugadorXYN){
+void jugar_en_tablero(struct XYN_tablero *jugadorXYN){
     //Leer input
-    jugadorXYN.input = getch();
+    jugadorXYN->input = getch();
     //Se inicializa el valor del numero para la casilla en 0
-    jugadorXYN.numero = 0;
+    jugadorXYN->numero = 0;
 
-    switch (jugadorXYN.input){
+    switch (jugadorXYN->input){
     //Se suman o se restan posiciones dependiendo la tecla que se presione
     //Casos para moverse en el tablero
     case ARRIBA:           
-        jugadorXYN.y--; 
+        jugadorXYN->y--; 
 
-        if(jugadorXYN.y < 0){
-            jugadorXYN.y = 8;
+        if(jugadorXYN->y < 0){
+            jugadorXYN->y = 8;
         }
         break;
     case ABAJO:
-        jugadorXYN.y++;
+        jugadorXYN->y++;
 
-        if(jugadorXYN.y > 9){
-            jugadorXYN.y = 0;
+        if(jugadorXYN->y > 9){
+            jugadorXYN->y = 0;
         }
         break;
     case DERECHA:
-        jugadorXYN.x++;
+        jugadorXYN->x++;
 
-        if(jugadorXYN.x > 8){
-            jugadorXYN.x = 0;
+        if(jugadorXYN->x > 8){
+            jugadorXYN->x = 0;
         }
         break;
     case IZQUIERDA:
-        jugadorXYN.x--;
+        jugadorXYN->x--;
 
-        if(jugadorXYN.x < 0){
-            jugadorXYN.x = 8;
+        if(jugadorXYN->x < 0){
+            jugadorXYN->x = 8;
         }
         break;
 
     //Casos para dijitar un numero
     case N1:
-        jugadorXYN.numero = 1;
+        jugadorXYN->numero = 1;
         break;
     case N2:
-        jugadorXYN.numero = 2;
+        jugadorXYN->numero = 2;
         break;
     case N3:
-        jugadorXYN.numero = 3;
+        jugadorXYN->numero = 3;
         break;
     case N4:
-        jugadorXYN.numero = 4;
+        jugadorXYN->numero = 4;
         break;
     case N5:
-        jugadorXYN.numero = 5;
+        jugadorXYN->numero = 5;
         break;
     case N6:
-        jugadorXYN.numero = 6;
+        jugadorXYN->numero = 6;
         break;
     case N7:
-        jugadorXYN.numero = 7;
+        jugadorXYN->numero = 7;
         break;
     case N8:
-        jugadorXYN.numero = 8;
+        jugadorXYN->numero = 8;
         break;
     case N9:
-        jugadorXYN.numero = 9;
+        jugadorXYN->numero = 9;
         break;
     }
-
-    return jugadorXYN;
 }
 
 struct Tablero crearCasillas(){
