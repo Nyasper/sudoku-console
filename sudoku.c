@@ -19,12 +19,36 @@
 #define N9 57
 
 /*Estructuras*/
+//Estructura para almacenar las propiedades de cada casilla
+struct Casilla{
+    //Almacena un valor numerico en forma de caracter del 1 al 9 de la casilla para jugar
+    int valor;
+    //Variable binaria que nos dice si la casilla se puede modificar 0=NO 1=SI
+    int modificable;
+    //Cadena de caracteres que se va a imprimir en pantalla
+    char imprimir;
+};
+
+//Estructura para almacenar los datos de un juegador
 struct Jugador{
     char nombre[10];
     char usuario[10];
     char contrasena[10];
     int puntaje;
     int sesion;
+
+    //Arreglo que va a almacenar las casillas llenadas por el jugador
+    struct Casilla progreso[9][9];
+};
+
+//Estructura para almacenar coordenadas del tablero de juego y los inputs del jugador
+struct XYN_tablero{
+    int x;
+    int y;
+    //Variable que va a guardar lo que presione el jugador
+    char input;
+    //Varible para guardar el numero dijitado por el jugador
+    int numero;
 };
 
 //Esta estructura es para guardar el estado de los menus
@@ -68,43 +92,14 @@ void imprimirTitulo();
 //Funcion que inicia el juego (void temporal)
 void jugarSudoku();
 
-//Estructura para almacenar coordenadas del tablero de juego y los inputs del jugador
-struct XYN_tablero{
-    int x;
-    int y;
-    //Variable que va a guardar lo que presione el jugador
-    char input;
-    //Varible para guardar el numero dijitado por el jugador
-    int numero;
-};
-
-//Estructura para almacenar las propiedades de cada casilla
-struct Casilla{
-    //Almacena un valor numerico en forma de caracter del 1 al 9 de la casilla para jugar
-    int valor;
-    //Variable binaria que nos dice si la casilla se puede modificar 0=NO 1=SI
-    int modificable;
-    //Cadena de caracteres que se va a imprimir en pantalla
-    char imprimir;
-    //coordenadas
-    int x;
-    int y;
-};
-
 //funcion para moverse en el tablero de juego y para colocar el numero que usuario eligio para poner en casilla
 void jugar_en_tablero(struct XYN_tablero *posicion);
 
 //Pide un numero para llenar la casilla seleccionada
 char llenarCasilla();
 
-//Estructura para almacenar las casillas del juego
-struct Tablero{
-    //Guarda la imformacion de las 81 casillas
-    struct Casilla xy[9][9];
-};
-
 //Crea las 81 casillas
-struct Tablero crearCasillas();
+void crearCasillas(struct Jugador *jugador);
 
 
 /*-------------------------------------------Funcion main-------------------------------------------------------------*/
@@ -144,7 +139,7 @@ int main(){
             //Opcion seleccionada por el jugador
             switch (opcion){
                 case 1: //Corresponde a jugar
-                    jugarSudoku();
+                    jugarSudoku(&Jugador);
                     break;
                 case 2: //Corresponde a ver los puntajes
                     printf("\tLista de puntajes\n");
@@ -286,7 +281,7 @@ struct Jugador iniciarSesion(){
     struct Jugador Login;
 
     //Variable para abrir el archhivo de usuarios en modo lectura
-    FILE * usuarios = fopen(".usuarios.txt", "r");
+    FILE *usuarios = fopen(".usuarios.txt", "r");
 
     //Comprobar si el archivo se abrio correctamente
     if(usuarios == NULL){
@@ -423,7 +418,7 @@ void crearCuenta(){
     int espacios = 1;
 
     //Abrimos el archivo de usuarios en "a" para agregar
-    FILE * users = fopen(".usuarios.txt", "a");
+    FILE *users = fopen(".usuarios.txt", "a");
 
     //Comprobamos si el archivo se abrio correctamente
     if(users == NULL){
@@ -432,12 +427,12 @@ void crearCuenta(){
 
         //Varieble para saber si el usuario quiere intentarlo de nuevo
         int deNuevo = 1;
-        printf("\tCREA TU CUENTA DE SUDOKU\n\n");
         //Crea una funcion de tipo void para imprimir las indicaciones
 
 
         //Mientras los datos no se hayan ingresado correctamente
         while(datosOK == 0 && deNuevo == 1){
+            printf("\tCREA TU CUENTA DE SUDOKU\n\n");
             fflush(stdin);
             printf("\tIngresa tus datos:\n\n");
 
@@ -486,7 +481,10 @@ void crearCuenta(){
             for(i=0; i<13; i++){
                 printf("%c",254);
                 Sleep(20);
-            }   
+            }
+
+            //Inicializa su tablero guardado en vacio
+            
             printf("\n\n");
 
             printf("\t\t Listo!\n\t Cuenta creada exitosamente.");
@@ -571,18 +569,16 @@ void imprimirTitulo(){
 
 /*Funciones para la logica del juego*/
 
-void jugarSudoku(){
+void jugarSudoku(struct Jugador *jugador){
     //Estructura que almacena la posicion del jugador en el tablero del suidoku (x, y)
     struct XYN_tablero posicionJugador;
     //Se inicializan la posicion del jugador en (0, 0) y con enter = 0
     posicionJugador.x = 0;
     posicionJugador.y = 0;
 
-    //Se crea el tablero
-    struct Tablero TABLERO;
 
     //Se crea el tablero
-    TABLERO = crearCasillas();
+    crearCasillas(jugador);
 
     //Variable para saber si el jugador continua jugando
     int juego = 1;
@@ -602,20 +598,20 @@ void jugarSudoku(){
             for(x=0; x<9; x++){
                 if(x == posicionJugador.x && y == posicionJugador.y){
                     //Imprime el caracter correspondiente a la coordenada x, y
-                    printf(" %c %c", 254, TABLERO.xy[x][y].imprimir);
+                    printf(" %c %c", 254, jugador->progreso[x][y].imprimir);
                 }else{
                     //Imprime el caracter correspondiente a la coordenada x, y
-                    if(TABLERO.xy[x][y].valor == 0){
-                        printf("   %c", TABLERO.xy[x][y].imprimir);
+                    if(jugador->progreso[x][y].valor == 0){
+                        printf("   %c", jugador->progreso[x][y].imprimir);
                     }else{
-                        printf(" %d %c",TABLERO.xy[x][y].valor ,TABLERO.xy[x][y].imprimir);
+                        printf(" %d %c",jugador->progreso[x][y].valor ,jugador->progreso[x][y].imprimir);
                     }
                 }
                 
 
                 /*Estos casos son para toma en cuenta las peculiaridades del tablero*/
                 if((x+1)%3 == 0 && x < 8){
-                    printf("%c", TABLERO.xy[x][y].imprimir);
+                    printf("%c", jugador->progreso[x][y].imprimir);
                 }
                 
                 if(x == 8 && y != 8 && (y+1)%3 != 0){
@@ -627,11 +623,20 @@ void jugarSudoku(){
             }
         }
 
+        //La posicionJugador.y = 9 es la opcion de salir
+        
+        if(jugador->progreso[posicionJugador.x][posicionJugador.y].valor != 0 && posicionJugador.y != 9){
+            printf("\n\tNumero en la casilla: %d", jugador->progreso[posicionJugador.x][posicionJugador.y].valor);
+            printf("\n\n\t\t\t Salir\n\n");
+        }
+        if(jugador->progreso[posicionJugador.x][posicionJugador.y].valor == 0 && posicionJugador.y != 9){
+            printf("\n\tNumero en la casilla: Ninguno");
+            printf("\n\n\t\t\t Salir\n\n");
+        }
         //Boton de salir
         if(posicionJugador.y == 9){
+            printf("\n");
             printf("\n\n\t\t\t>Salir\n\n");
-        }else{
-            printf("\n\n\t\t\t Salir\n\n");
         }
         
         jugar_en_tablero(&posicionJugador);
@@ -642,8 +647,8 @@ void jugarSudoku(){
             juego = 0;
         }
         //Si se presiona algun numero cambia el valor de la casilla
-        if(posicionJugador.numero != 0){
-            TABLERO.xy[posicionJugador.x][posicionJugador.y].valor = posicionJugador.numero;
+        if(posicionJugador.numero != 0 && posicionJugador.y != 9){
+            jugador->progreso[posicionJugador.x][posicionJugador.y].valor = posicionJugador.numero;
         }
 
 
@@ -720,28 +725,21 @@ void jugar_en_tablero(struct XYN_tablero *jugadorXYN){
     }
 }
 
-struct Tablero crearCasillas(){
+void crearCasillas(struct Jugador *jugador){
     //Contadores para el for
     int x, y;
-
-    //Valor para la casilla
-
-    //Tablero al que se le van a dar valores
-    struct Tablero TABLERO;
 
     //for para darle los valores a las casillas en y
     for(y=0; y<9; y++){
         //for para darle valores a x
         for(x=0; x<9; x++){
             //Le da un valor vacio a la casilla
-            TABLERO.xy[x][y].valor = 0;
+            jugador->progreso[x][y].valor = 0;
             if(x < 8){
-                TABLERO.xy[x][y].imprimir = '|';
+                jugador->progreso[x][y].imprimir = '|';
             }else{
-                TABLERO.xy[x][y].imprimir = '\n';
+                jugador->progreso[x][y].imprimir = '\n';
             }
         }
     }
-
-    return TABLERO;
 }
