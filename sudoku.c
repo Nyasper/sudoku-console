@@ -317,14 +317,34 @@ struct Jugador iniciarSesion(){
             int encontrado = 0;
             //while para iterar entre todos los usuarios de la base de datos para saber si alguno conincide
             while(feof(usuarios) == 0 && encontrado == 0){
-                fscanf(usuarios, "%s %s %s %d %d", Jugador.nombre, Jugador.usuario, Jugador.contrasena, &Jugador.puntaje, &Jugador.sesion);
+                fscanf(usuarios, "%s", Jugador.usuario);
 
-                //Si el usuario y contrasena coincide con alguno de la base de datos .txt
-                if(strcmp(Jugador.usuario, Login.usuario) == 0 && strcmp(Jugador.contrasena, Login.contrasena) == 0){
-                    //El usuario ha iniciado sesion
-                    Jugador.sesion = 1;
-                    encontrado = 1;
-                    deNuevo = 0;
+                //Si el usuario coincide con alguno de la base de datos .txt
+                if(strcmp(Jugador.usuario, Login.usuario) == 0){
+                    //se genera la ruta para acceder  los demas datos y comprobar
+                    _crearRuta(&Login);
+
+                    //Lee el archivo de ese usuario
+                    FILE *iniciar = fopen(Login.ruta, "r");
+                    if(iniciar != NULL){
+
+                        //Se leen los datos del usuario
+                        fread(&Jugador, sizeof(struct Jugador), 1, iniciar);
+
+                        //Se comprueba si la contrasena coincide
+                        if(strcmp(Jugador.contrasena, Login.contrasena) == 0){
+                            //Si coincide el jugador inicia sesion
+                            //El usuario ha iniciado sesion
+                            Jugador.sesion = 1;
+                            encontrado = 1;
+                            deNuevo = 0;
+                        }
+
+                        //Se cierrra el archivo
+                        fclose(iniciar);
+                    }else{
+                        _errorSistemaDeUsuarios();
+                    }
                 }
             }
             limpiarPantalla();
