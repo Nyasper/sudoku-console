@@ -566,8 +566,8 @@ int _usuarioExiste(char *usuario[10]){
 
     if(txt != NULL){
         while(feof(txt) == 0 && existe == 0){
-            fscanf(txt, "%s %s\n", usu, ruta);
-            printf("\n\t%s %s", usu, ruta);
+            fscanf(txt, "%s", usu);
+            //printf("\n\t%s %s", usu, ruta);
             //si encontro al usuario
             if(strcmp(usu, usuario) == 0){
                 existe = 1;
