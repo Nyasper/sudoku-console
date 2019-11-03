@@ -72,6 +72,10 @@ void crearCuenta();
 void _quitarDn(struct Jugador *Nuevo);
 //Comprueba si el jugador uso un espacio para alguno de sus datos
 int _comprobarEspacios(struct Jugador *Nuevo);
+//Comprueba si el usuario existe
+int _usuarioExiste(char *usuario[10]);
+//Crea la direccion donde se va a guardar el archivo de datos del usuario
+void _crearRuta(char *usuario[10], char *rutaNueva[25]);
 //Menu para iniciar sesion
 struct Jugador iniciarSesion();
 //Funcion para los errores del sistema de usuarios
@@ -378,7 +382,10 @@ int menu_IntentarDeNuevo(int error){
             printf("\n\tERROR: Pusiste algun espacio en la contrase%ca, nombre o usuario.\n\n", 164);
             break;
         case 2: //Error de la funcion crearCuenta()
-            printf("\n\tERROR: Dejaste algun espacio vacio\n\n");
+            printf("\n\tERROR: No llenaste algun espacio.\n\n");
+            break;
+        case 3: //Error de la funcion crearCuenta()
+            printf("\n\tERROR: Ese usuario ya existe.\n\n");
             break;
         }
         
@@ -416,6 +423,8 @@ void crearCuenta(){
     int datosOK = 0;
     //variable para saber si el usuario no ingreso espacios
     int espacios = 1;
+    //Variable para saber si el usuario ya existe
+    int existe;
 
     //Abrimos el archivo de usuarios en "a" para agregar
     FILE *users = fopen(".usuarios.txt", "a");
@@ -451,15 +460,20 @@ void crearCuenta(){
 
             //Comprobar si dejaron un espacio
             espacios = _comprobarEspacios(&Nuevo);
+            //Comprueba si el usuario existe
+            existe = _usuarioExiste(Nuevo.usuario);
 
-            //Comprueba si el jugador dejo un espacio vacio y que sus datos no tengan espacios
-            if(Nuevo.nombre[0] != '\n' && Nuevo.usuario[0] != '\n' && Nuevo.contrasena[0] != '\n' && espacios == 0){
+            //Comprueba si el jugador dejo un espacio vacio, que sus datos no tengan espacios y que el usuario no exista
+            if(Nuevo.nombre[0] != '\n' && Nuevo.usuario[0] != '\n' && Nuevo.contrasena[0] != '\n' && espacios == 0 && existe == 0){
                 datosOK = 1;
                 deNuevo = 0;
             }else{
                 limpiarPantalla();
                 if(espacios == 1){
                     deNuevo = menu_IntentarDeNuevo(1);
+                }
+                if(existe == 1){
+                    deNuevo = menu_IntentarDeNuevo(3);
                 }else{
                     deNuevo = menu_IntentarDeNuevo(2);
                 }
@@ -475,8 +489,35 @@ void crearCuenta(){
             //Quitar los \n
             _quitarDn(&Nuevo);
 
+            //Crea la ruta donde se van a guardar los datos del juagdor
+            char rutaNueva[25] = "";
+            _crearRuta(Nuevo.usuario, rutaNueva);
+
             //Escrbir en el archivo
-            fprintf(users, "%s %s %s %d %d\n", Nuevo.nombre, Nuevo.usuario, Nuevo.contrasena, Nuevo.puntaje, Nuevo.sesion);
+            fprintf(users, "%s %s\n", Nuevo.usuario, rutaNueva);
+
+            //Crear archivo del usuario.db
+            FILE *NuevoUsuario = fopen(rutaNueva, "w");
+
+            if(NuevoUsuario != NULL){
+                //Se inicializa el puntaje y la sesion del usuario en falso
+                Nuevo.puntaje = 0;
+                Nuevo.sesion = 0;
+
+                //Se crea su tablero como vacio
+                crearCasillas(&Nuevo);
+
+                //Se escriben los datos del usuario en el archivo
+                fwrite(&Nuevo, sizeof(struct Jugador), 1, NuevoUsuario);
+                //se cierra el archivo
+                fclose(NuevoUsuario);
+
+            }else{
+                limpiarPantalla();
+                printf("%s\n", rutaNueva);
+                printf("Error ):");
+                _errorSistemaDeUsuarios();
+            }
 
             for(i=0; i<13; i++){
                 printf("%c",254);
@@ -499,6 +540,47 @@ void crearCuenta(){
         }
 
     }
+}
+
+void _crearRuta(char *usuario[10], char *rutaNueva[25]){
+    //Carpeta donde se van a almacenar los datos del nuevo usario
+    char carpeta[11] = "./Usuarios/";
+    //Extencion en la que se va a guardar los datos del usuario
+    char db[3] = ".db";
+
+    //Concatena el nuevo usuario con su exencion de archivo en la capeta donde se va a guardar
+    strcat(rutaNueva, carpeta);
+    strcat(rutaNueva, usuario);
+    strcat(rutaNueva, db);
+}
+
+int _usuarioExiste(char *usuario[10]){
+    //Abrir el archivo de usuarios en modo lectura
+    FILE *txt = fopen(".usuarios.txt", "r");
+    //variable que indica si el usuario esta disponible
+    int existe = 0;
+    //Variables para alcenar lo que se esta leyendo
+    char usu[10];
+    char ruta[25];
+
+    if(txt != NULL){
+        while(feof(txt) == 0 && existe == 0){
+            fscanf(txt, "%s %s\n", usu, ruta);
+            printf("\n\t%s %s", usu, ruta);
+            //si encontro al usuario
+            if(strcmp(usu, usuario) == 0){
+                existe = 1;
+            }
+        }
+
+        //Cierra el archivo de .usuarios.txt
+        fclose(txt);
+    }else{
+        printf("Error en _usuarioExiste()");
+        _errorSistemaDeUsuarios();
+    }
+
+    return existe;
 }
 
 int _comprobarEspacios(struct Jugador *Nuevo){
@@ -735,6 +817,7 @@ void crearCasillas(struct Jugador *jugador){
         for(x=0; x<9; x++){
             //Le da un valor vacio a la casilla
             jugador->progreso[x][y].valor = 0;
+            jugador->progreso[x][y].modificable = 1;
             if(x < 8){
                 jugador->progreso[x][y].imprimir = '|';
             }else{
