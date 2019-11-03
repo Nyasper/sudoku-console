@@ -39,6 +39,8 @@ struct Jugador{
 
     //Arreglo que va a almacenar las casillas llenadas por el jugador
     struct Casilla progreso[9][9];
+    //Va a contener la ruta donde van a estar sus datos
+    char ruta[10];
 };
 
 //Estructura para almacenar coordenadas del tablero de juego y los inputs del jugador
@@ -490,14 +492,13 @@ void crearCuenta(){
             _quitarDn(&Nuevo);
 
             //Crea la ruta donde se van a guardar los datos del juagdor
-            char rutaNueva[25] = "";
-            _crearRuta(Nuevo.usuario, rutaNueva);
+            _crearRuta(Nuevo.usuario, Nuevo.ruta);
 
             //Escrbir en el archivo
-            fprintf(users, "%s %s\n", Nuevo.usuario, rutaNueva);
+            fprintf(users, "\n%s", Nuevo.usuario);
 
             //Crear archivo del usuario.db
-            FILE *NuevoUsuario = fopen(rutaNueva, "w");
+            FILE *NuevoUsuario = fopen(Nuevo.ruta, "w");
 
             if(NuevoUsuario != NULL){
                 //Se inicializa el puntaje y la sesion del usuario en falso
@@ -514,7 +515,7 @@ void crearCuenta(){
 
             }else{
                 limpiarPantalla();
-                printf("%s\n", rutaNueva);
+                printf("%s\n", Nuevo.ruta);
                 printf("Error ):");
                 _errorSistemaDeUsuarios();
             }
