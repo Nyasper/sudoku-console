@@ -310,6 +310,9 @@ struct Jugador iniciarSesion(){
         int deNuevo = 1;
 
         while(deNuevo == 1){
+            //regresa al inico del archivo .usuarios.txt
+            rewind(usuarios);
+
             limpiarPantalla();
             printf("\n\t\tIniciar sesion\n\n");
 
@@ -394,6 +397,9 @@ struct Jugador iniciarSesion(){
             }
         }////fin while
 	}
+
+    //Se cierra el archivo .usuarios.txt
+    fclose(usuarios);
 
     return Jugador;
 }
