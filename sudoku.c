@@ -40,7 +40,7 @@ struct Jugador{
     //Arreglo que va a almacenar las casillas llenadas por el jugador
     struct Casilla progreso[9][9];
     //Va a contener la ruta donde van a estar sus datos
-    char ruta[10];
+    char ruta[25];
 };
 
 //Estructura para almacenar coordenadas del tablero de juego y los inputs del jugador
@@ -77,7 +77,7 @@ int _comprobarEspacios(struct Jugador *Nuevo);
 //Comprueba si el usuario existe
 int _usuarioExiste(struct Jugador N);
 //Crea la direccion donde se va a guardar el archivo de datos del usuario
-void _crearRuta(char *usuario[10], char *rutaNueva[25]);
+void _crearRuta(struct Jugador *Nuevo);
 //Menu para iniciar sesion
 struct Jugador iniciarSesion();
 //Funcion para los errores del sistema de usuarios
@@ -492,7 +492,7 @@ void crearCuenta(){
             _quitarDn(&Nuevo);
 
             //Crea la ruta donde se van a guardar los datos del juagdor
-            _crearRuta(Nuevo.usuario, Nuevo.ruta);
+            _crearRuta(&Nuevo);
 
             //Escrbir en el archivo
             fprintf(users, "\n%s", Nuevo.usuario);
@@ -543,16 +543,20 @@ void crearCuenta(){
     }
 }
 
-void _crearRuta(char *usuario[10], char *rutaNueva[25]){
+void _crearRuta(struct Jugador *Nuevo){
     //Carpeta donde se van a almacenar los datos del nuevo usario
     char carpeta[11] = "./Usuarios/";
     //Extencion en la que se va a guardar los datos del usuario
     char db[3] = ".db";
 
+    // //Limpiar la basura dentro de la ruta
+    // int i;
+    // for(i=0; i<25; i++)
+
     //Concatena el nuevo usuario con su exencion de archivo en la capeta donde se va a guardar
-    strcat(rutaNueva, carpeta);
-    strcat(rutaNueva, usuario);
-    strcat(rutaNueva, db);
+    strcat(Nuevo->ruta, carpeta);
+    strcat(Nuevo->ruta, Nuevo->usuario);
+    strcat(Nuevo->ruta, db);
 }
 
 int _usuarioExiste(struct Jugador N){
