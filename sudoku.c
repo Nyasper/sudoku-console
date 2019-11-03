@@ -114,6 +114,9 @@ void recargarJugador(struct Jugador *jugador);
 //Guarda el progreso del jugador
 void guardarProgreso(struct Jugador *jugador);
 
+//Limpia el progreso del jugador
+void limpiarProgreso(struct Jugador *jugador);
+
 //Crea las 81 casillas
 void crearCasillas(struct Jugador *jugador);
 
@@ -788,22 +791,7 @@ void jugarSudoku(struct Jugador *jugador){
             limpiarPantalla();
             
             //Menu para confirmar si el jugador quiere salir sin guardar.
-            submenu.enter = 0;
-            submenu.posicion = 1;
-            while(submenu.enter == 0){
-                printf("\n\n\t%cQuieres salir sin guardar?");   
-
-                switch(submenu.posicion){
-                    case 1:
-                        printf("\n\n\t\t>Si     No\n\n");
-                        break;
-                    case 2:
-                        printf("\n\n\t\t Si     >No\n\n");
-                        break;
-                }
-                submenu = mover(submenu.posicion, 1, 2);
-                limpiarPantalla();
-            }
+            menu_SiONo(&submenu, 1);
 
             if(submenu.posicion == 1){
                 //Se recarga el jugador 
@@ -816,7 +804,7 @@ void jugarSudoku(struct Jugador *jugador){
 
         //Si se presiono enter seleccionando la opcion de salir y guardar
         if(posicionJugador.input == ENTER && posicionJugador.y == 9 && posicionJugador.x_menu == 1){
-            
+
             guardarProgreso(jugador);
 
             //Se termina el juego
@@ -825,8 +813,17 @@ void jugarSudoku(struct Jugador *jugador){
 
         //Si se presiono enter seleccionando la opcion de limpiar
         if(posicionJugador.input == ENTER && posicionJugador.y == 9 && posicionJugador.x_menu == 2){
-            //Se termina el juego
-            juego = 0;
+            limpiarPantalla();
+
+            //Menu para confirmar si el jugador quiere limpiar su progreso
+            menu_SiONo(&submenu, 2);
+
+            //Si el jugador dice que si, se limpia su progreso
+            if(submenu.posicion == 1){
+                //Se limpia su progreso 
+                limpiarProgreso(jugador);
+
+            }
         }
 
         //Si se presiono enter seleccionando la opcion de nuevo
@@ -837,6 +834,51 @@ void jugarSudoku(struct Jugador *jugador){
 
         limpiarPantalla();
     }
+}
+
+void limpiarProgreso(struct Jugador *jugador){
+    //Contadores para el for
+    int x, y;
+
+    //for para darle los valores a las casillas en y
+    for(y=0; y<9; y++){
+        //for para darle valores a x
+        for(x=0; x<9; x++){
+            if(jugador->progreso[x][y].modificable == 1){
+                //Le da un valor vacio a la casilla
+                jugador->progreso[x][y].valor = 0;
+            }
+        }
+    }
+}
+
+void menu_SiONo(struct Menu *menu, int imprimir){
+    menu->enter = 0;
+    menu->posicion = 1;
+    while(menu->enter == 0){
+
+        switch(imprimir){
+            case 1:
+                printf("\n\n\t%cQuieres salir sin guardar?");   
+                break;
+            
+            case 2:
+                printf("\n\n\t%cQuieres limpiar tu progreso?");   
+                break;
+        }
+
+        switch(menu->posicion){
+            case 1:
+                printf("\n\n\t\t>Si     No\n\n");
+                break;
+            case 2:
+                printf("\n\n\t\t Si    >No\n\n");
+                break;
+        }
+        *menu = mover(menu->posicion, 1, 2);
+        limpiarPantalla();
+    }
+
 }
 
 void guardarProgreso(struct Jugador *jugador){
