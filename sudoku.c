@@ -45,8 +45,12 @@ struct Jugador{
 
 //Estructura para almacenar coordenadas del tablero de juego y los inputs del jugador
 struct XYN_tablero{
+    //Posicion en x en el tablero
     int x;
+    //Posicion en y en el tablero
     int y;
+    //posicion en x del menu abajo del tablero
+    int x_menu;
     //Variable que va a guardar lo que presione el jugador
     char input;
     //Varible para guardar el numero dijitado por el jugador
@@ -683,6 +687,7 @@ void jugarSudoku(struct Jugador *jugador){
     //Se inicializan la posicion del jugador en (0, 0) y con enter = 0
     posicionJugador.x = 0;
     posicionJugador.y = 0;
+    posicionJugador.x_menu = 0;
 
 
     // //Se crea el tablero
@@ -735,16 +740,30 @@ void jugarSudoku(struct Jugador *jugador){
         
         if(jugador->progreso[posicionJugador.x][posicionJugador.y].valor != 0 && posicionJugador.y != 9){
             printf("\n\tNumero en la casilla: %d", jugador->progreso[posicionJugador.x][posicionJugador.y].valor);
-            printf("\n\n\t\t\t Salir\n\n");
+            printf("\n\n     Salir    Salir y Guardar    Limpiar    Nuevo\n\n");
         }
         if(jugador->progreso[posicionJugador.x][posicionJugador.y].valor == 0 && posicionJugador.y != 9){
             printf("\n\tNumero en la casilla: Ninguno");
-            printf("\n\n\t\t\t Salir\n\n");
+            printf("\n\n     Salir    Salir y Guardar    Limpiar    Nuevo\n\n");
         }
         //Boton de salir
         if(posicionJugador.y == 9){
             printf("\n");
-            printf("\n\n\t\t\t>Salir\n\n");
+
+            switch(posicionJugador.x_menu){
+                case 0:
+                    printf("\n\n    >Salir    Salir y Guardar    Limpiar    Nuevo\n\n");
+                break;
+                case 1:
+                    printf("\n\n     Salir   >Salir y Guardar    Limpiar    Nuevo\n\n");
+                break;
+                case 2:
+                    printf("\n\n     Salir    Salir y Guardar   >Limpiar    Nuevo\n\n");
+                break;
+                case 3:
+                    printf("\n\n     Salir    Salir y Guardar    Limpiar   >Nuevo\n\n");
+                break;
+            }
         }
         
         jugar_en_tablero(&posicionJugador);
@@ -788,17 +807,33 @@ void jugar_en_tablero(struct XYN_tablero *jugadorXYN){
         }
         break;
     case DERECHA:
-        jugadorXYN->x++;
+        if(jugadorXYN->y != 9){
+            jugadorXYN->x++;
 
-        if(jugadorXYN->x > 8){
-            jugadorXYN->x = 0;
+            if(jugadorXYN->x > 8){
+                jugadorXYN->x = 0;
+            }
+        }else{
+            jugadorXYN->x_menu++;
+
+            if(jugadorXYN->x_menu > 3){
+                jugadorXYN->x_menu = 0;
+            }
         }
         break;
     case IZQUIERDA:
-        jugadorXYN->x--;
+        if(jugadorXYN->y != 9){
+            jugadorXYN->x--;
 
-        if(jugadorXYN->x < 0){
-            jugadorXYN->x = 8;
+            if(jugadorXYN->x < 0){
+                jugadorXYN->x = 8;
+            }
+        }else{
+            jugadorXYN->x_menu--;
+
+            if(jugadorXYN->x_menu < 0){
+                jugadorXYN->x_menu = 3;
+            }
         }
         break;
 
