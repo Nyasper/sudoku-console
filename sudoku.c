@@ -75,7 +75,7 @@ void _quitarDn(struct Jugador *Nuevo);
 //Comprueba si el jugador uso un espacio para alguno de sus datos
 int _comprobarEspacios(struct Jugador *Nuevo);
 //Comprueba si el usuario existe
-int _usuarioExiste(char *usuario[10]);
+int _usuarioExiste(struct Jugador N);
 //Crea la direccion donde se va a guardar el archivo de datos del usuario
 void _crearRuta(char *usuario[10], char *rutaNueva[25]);
 //Menu para iniciar sesion
@@ -463,7 +463,7 @@ void crearCuenta(){
             //Comprobar si dejaron un espacio
             espacios = _comprobarEspacios(&Nuevo);
             //Comprueba si el usuario existe
-            existe = _usuarioExiste(Nuevo.usuario);
+            existe = _usuarioExiste(Nuevo);
 
             //Comprueba si el jugador dejo un espacio vacio, que sus datos no tengan espacios y que el usuario no exista
             if(Nuevo.nombre[0] != '\n' && Nuevo.usuario[0] != '\n' && Nuevo.contrasena[0] != '\n' && espacios == 0 && existe == 0){
@@ -555,21 +555,22 @@ void _crearRuta(char *usuario[10], char *rutaNueva[25]){
     strcat(rutaNueva, db);
 }
 
-int _usuarioExiste(char *usuario[10]){
+int _usuarioExiste(struct Jugador N){
     //Abrir el archivo de usuarios en modo lectura
     FILE *txt = fopen(".usuarios.txt", "r");
     //variable que indica si el usuario esta disponible
     int existe = 0;
+    //Quitar los \n
+    _quitarDn(&N);
     //Variables para alcenar lo que se esta leyendo
     char usu[10];
-    char ruta[25];
 
     if(txt != NULL){
         while(feof(txt) == 0 && existe == 0){
             fscanf(txt, "%s", usu);
             //printf("\n\t%s %s", usu, ruta);
             //si encontro al usuario
-            if(strcmp(usu, usuario) == 0){
+            if(strcmp(usu, N.usuario) == 0){
                 existe = 1;
             }
         }
