@@ -108,6 +108,9 @@ void jugar_en_tablero(struct XYN_tablero *posicion);
 //Pide un numero para llenar la casilla seleccionada
 char llenarCasilla();
 
+//Recargan los datos del jugador
+void recargarJugador(struct Jugador *jugador);
+
 //Crea las 81 casillas
 void crearCasillas(struct Jugador *jugador);
 
@@ -702,6 +705,9 @@ void jugarSudoku(struct Jugador *jugador){
     //Variable donde se almacena el numero que va a poner el jugador
     int n;
 
+    //Estructura para moverse en los submenus
+    struct Menu submenu;
+
     //Mientras quiera continuar con el juego
     while(juego == 1){
         printf("\n\n\t\t\tSudoku\n\n\t");
@@ -768,19 +774,78 @@ void jugarSudoku(struct Jugador *jugador){
         
         jugar_en_tablero(&posicionJugador);
 
-        //Si se presiono enter seleccionando la opcion de salir
-        if(posicionJugador.input == ENTER && posicionJugador.y == 9){
-            //Se termina el juego
-            juego = 0;
-        }
         //Si se presiona algun numero cambia el valor de la casilla
         if(posicionJugador.numero != 0 && posicionJugador.y != 9){
             jugador->progreso[posicionJugador.x][posicionJugador.y].valor = posicionJugador.numero;
         }
 
+        //opciones del menu abajo del tablero
+        //Si se presiono enter seleccionando la opcion de salir
+        if(posicionJugador.input == ENTER && posicionJugador.y == 9 && posicionJugador.x_menu == 0){
+            limpiarPantalla();
+            
+            submenu.enter = 0;
+            submenu.posicion = 1;
+            while(submenu.enter == 0){
+                printf("\n\n\t%cQuieres salir sin guardar?");   
+
+                switch(submenu.posicion){
+                    case 1:
+                        printf("\n\n\t\t>Si     No\n\n");
+                        break;
+                    case 2:
+                        printf("\n\n\t\t Si     >No\n\n");
+                        break;
+                }
+                submenu = mover(submenu.posicion, 1, 2);
+                limpiarPantalla();
+            }
+
+            if(submenu.posicion == 1){
+                //Se recarga el jugador 
+                recargarJugador(jugador);
+                jugador->sesion = 1;
+
+                //Se termina el juego
+                juego = 0;
+            }
+        }
+
+        //Si se presiono enter seleccionando la opcion de salir y guardar
+        if(posicionJugador.input == ENTER && posicionJugador.y == 9 && posicionJugador.x_menu == 1){
+            //Se termina el juego
+            juego = 0;
+        }
+
+        //Si se presiono enter seleccionando la opcion de limpiar
+        if(posicionJugador.input == ENTER && posicionJugador.y == 9 && posicionJugador.x_menu == 2){
+            //Se termina el juego
+            juego = 0;
+        }
+
+        //Si se presiono enter seleccionando la opcion de nuevo
+        if(posicionJugador.input == ENTER && posicionJugador.y == 9 && posicionJugador.x_menu == 3){
+            //Se termina el juego
+            juego = 0;
+        }
 
         limpiarPantalla();
     }
+}
+
+void recargarJugador(struct Jugador *jugador){
+    FILE *datos = fopen(jugador->ruta, "r");
+
+    if(datos != NULL){
+        //Se recargan los datos del usuario
+        fread(jugador, sizeof(struct Jugador), 1, datos);
+
+        //Se cierrra el archivo
+        fclose(datos);
+    }else{
+        _errorSistemaDeUsuarios();
+    }
+
 }
 
 void jugar_en_tablero(struct XYN_tablero *jugadorXYN){
