@@ -63,7 +63,7 @@ struct Menu{
 
 /*Funciones de menus, impresion y sistema de usuarios*/
 
-//Imprime un menu y regresa la opcion del jugador
+//Imprime un menu y regresa la opcion del jugador, usa el nombre del juagdor para imprimirlo en la parte de arriba
 int juegoMenu(char nombre[10]);            
 
 //Imprime el menu para que el jugador inicie sesion o cree una cuenta
@@ -685,8 +685,8 @@ void jugarSudoku(struct Jugador *jugador){
     posicionJugador.y = 0;
 
 
-    //Se crea el tablero
-    crearCasillas(jugador);
+    // //Se crea el tablero
+    //crearCasillas(jugador);
 
     //Variable para saber si el jugador continua jugando
     int juego = 1;
