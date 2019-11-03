@@ -111,6 +111,9 @@ char llenarCasilla();
 //Recargan los datos del jugador
 void recargarJugador(struct Jugador *jugador);
 
+//Guarda el progreso del jugador
+void guardarProgreso(struct Jugador *jugador);
+
 //Crea las 81 casillas
 void crearCasillas(struct Jugador *jugador);
 
@@ -784,6 +787,7 @@ void jugarSudoku(struct Jugador *jugador){
         if(posicionJugador.input == ENTER && posicionJugador.y == 9 && posicionJugador.x_menu == 0){
             limpiarPantalla();
             
+            //Menu para confirmar si el jugador quiere salir sin guardar.
             submenu.enter = 0;
             submenu.posicion = 1;
             while(submenu.enter == 0){
@@ -804,7 +808,6 @@ void jugarSudoku(struct Jugador *jugador){
             if(submenu.posicion == 1){
                 //Se recarga el jugador 
                 recargarJugador(jugador);
-                jugador->sesion = 1;
 
                 //Se termina el juego
                 juego = 0;
@@ -813,6 +816,9 @@ void jugarSudoku(struct Jugador *jugador){
 
         //Si se presiono enter seleccionando la opcion de salir y guardar
         if(posicionJugador.input == ENTER && posicionJugador.y == 9 && posicionJugador.x_menu == 1){
+            
+            guardarProgreso(jugador);
+
             //Se termina el juego
             juego = 0;
         }
@@ -833,12 +839,34 @@ void jugarSudoku(struct Jugador *jugador){
     }
 }
 
+void guardarProgreso(struct Jugador *jugador){
+    FILE *datos = fopen(jugador->ruta, "w");
+
+    if(datos != NULL){
+        //Se cierra la sesion del usuario
+        jugador->sesion = 0;
+        //Se se guarda el progreso del jugador en el almacenamiento
+        fwrite(jugador, sizeof(struct Jugador), 1, datos);
+
+        //se vuelve a abrir la sesion del usuario
+        jugador->sesion = 1;
+
+        //Se cierrra el archivo
+        fclose(datos);
+    }else{
+        _errorSistemaDeUsuarios();
+    }
+}
+
 void recargarJugador(struct Jugador *jugador){
     FILE *datos = fopen(jugador->ruta, "r");
 
     if(datos != NULL){
         //Se recargan los datos del usuario
         fread(jugador, sizeof(struct Jugador), 1, datos);
+
+        //se vuelve a abrir la sesion del usuario
+        jugador->sesion = 1;
 
         //Se cierrra el archivo
         fclose(datos);
