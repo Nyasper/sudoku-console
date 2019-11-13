@@ -2,6 +2,7 @@
 
 //Teclas para moverse en los menus y en el tablero de juego
 #define ENTER 13
+#define BORRAR 8
 #define IZQUIERDA 75
 #define DERECHA 77
 #define ARRIBA 72
@@ -789,6 +790,11 @@ void jugarSudoku(struct Jugador *jugador){
         //Si se presiona algun numero cambia el valor de la casilla
         if(posicionJugador.numero != 0 && posicionJugador.y != 9){
             jugador->progreso[posicionJugador.x][posicionJugador.y].valor = posicionJugador.numero;
+        }
+
+        //Si se presiona el boton de borrar y la casilla se puede modificar se borra el numero
+        if(posicionJugador.input == BORRAR && posicionJugador.y != 9 && jugador->progreso[posicionJugador.x][posicionJugador.y].modificable == 1){
+            jugador->progreso[posicionJugador.x][posicionJugador.y].valor = 0;
         }
 
         //opciones del menu abajo del tablero
