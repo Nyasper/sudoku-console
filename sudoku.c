@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 //Teclas para moverse en los menus y en el tablero de juego
 #define ENTER 13
@@ -42,6 +43,10 @@ struct Jugador{
     struct Casilla progreso[9][9];
     //Va a contener la ruta donde van a estar sus datos
     char ruta[25];
+    //Varible que va a almacenar cuantas casiilas ha llenado el usuario
+    char casillas_llenas;
+    //Variable que almacena que fue lo ultimo que hizo el jugador (moverse = 'm' o  dijitar numero = 'n')
+    char movimiento;
 };
 
 //Estructura para almacenar coordenadas del tablero de juego y los inputs del jugador
@@ -548,6 +553,11 @@ void crearCuenta(){
                 //Se crea su tablero como vacio
                 crearCasillas(&Nuevo);
 
+                //Las casillas llenas son igual a 0 + el numero de casillas con un valor inmodificable
+                Nuevo.casillas_llenas = 0;
+
+                Nuevo.movimiento = '0';
+
                 //Se escriben los datos del usuario en el archivo
                 fwrite(&Nuevo, sizeof(struct Jugador), 1, NuevoUsuario);
                 //se cierra el archivo
@@ -787,13 +797,29 @@ void jugarSudoku(struct Jugador *jugador){
         
         jugar_en_tablero(&posicionJugador);
 
+        //Nos indica que el jugador se movio en el tablero
+        jugador->movimiento = 'm';
+
         //Si se presiona algun numero cambia el valor de la casilla
         if(posicionJugador.numero != 0 && posicionJugador.y != 9){
+            //Se suma el contador de casillas llenadas si la posicion vale 0
+            if(jugador->progreso[posicionJugador.x][posicionJugador.y].valor == 0){
+                jugador->casillas_llenas++;
+            }
+
             jugador->progreso[posicionJugador.x][posicionJugador.y].valor = posicionJugador.numero;
+
+            //Cambia el ultimo movimiento a 'n'
+            jugador->movimiento = 'n';
         }
 
         //Si se presiona el boton de borrar y la casilla se puede modificar se borra el numero
         if(posicionJugador.input == BORRAR && posicionJugador.y != 9 && jugador->progreso[posicionJugador.x][posicionJugador.y].modificable == 1){
+            //Se resta el contador de casillas llenadas si la posicion tiene algun valor
+            if(jugador->progreso[posicionJugador.x][posicionJugador.y].valor != 0){
+                jugador->casillas_llenas--;
+            }
+
             jugador->progreso[posicionJugador.x][posicionJugador.y].valor = 0;
         }
 
@@ -844,6 +870,11 @@ void jugarSudoku(struct Jugador *jugador){
             juego = 0;
         }
 
+        //Si se llenaron todas las casillas conprueba si el tablero es correcto
+        if(jugador->casillas_llenas == 81 && jugador->movimiento == 'n'){
+            printf("\n\n\tcomprobarTablero()");
+        }
+
         limpiarPantalla();
     }
 }
@@ -871,11 +902,11 @@ void menu_SiONo(struct Menu *menu, int imprimir){
 
         switch(imprimir){
             case 1:
-                printf("\n\n\t%cQuieres salir sin guardar?");   
+                printf("\n\n\t%cQuieres salir sin guardar?", 168);   
                 break;
             
             case 2:
-                printf("\n\n\t%cQuieres limpiar tu progreso?");   
+                printf("\n\n\t%cQuieres limpiar tu progreso?", 168);   
                 break;
         }
 
