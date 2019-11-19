@@ -127,6 +127,9 @@ void limpiarProgreso(struct Jugador *jugador);
 //Crea las 81 casillas
 void crearCasillas(struct Jugador *jugador);
 
+//Crea un tablero jugable con x casillas llenas
+void crearTablero(struct Jugador *jugador);
+
 //Comprueba si el tablero es correcto y si lo es el jugador gana
 int comprobarTablero(struct Jugador *jugador);
 
@@ -904,7 +907,7 @@ void ganar(struct Jugador *jugador, int movimientos){
     limpiarPantalla();
 
     //Generar puntaje
-    jugador->puntaje = ((-log(movimientos) + 10)* 60);
+    jugador->puntaje = ((-log(movimientos) + 13)* 60);
 
     //Imprime felicitacion
     printf("\n\t _____                       _       _ \n");
@@ -1255,4 +1258,8 @@ void crearCasillas(struct Jugador *jugador){
             }
         }
     }
+}
+
+void crearTablero(struct Jugador *jugador){
+    
 }
