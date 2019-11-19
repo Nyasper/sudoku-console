@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 //Teclas para moverse en los menus y en el tablero de juego
 #define ENTER 13
@@ -129,6 +130,8 @@ void crearCasillas(struct Jugador *jugador);
 //Comprueba si el tablero es correcto y si lo es el jugador gana
 int comprobarTablero(struct Jugador *jugador);
 
+//Imprime una felicitacion, genera el puntaje y lo guarda
+void ganar(struct Jugador *jugador, int movimientos);
 
 /*-------------------------------------------Funcion main-------------------------------------------------------------*/
 int main(){
@@ -737,6 +740,9 @@ void jugarSudoku(struct Jugador *jugador){
     //Variable para saber si el jugador gano
     int ganar = 0;
 
+    //Variable que va a servir para generar el puntaje
+    int movimientos = 0;
+
     //Mientras quiera continuar con el juego
     while(juego == 1 && ganar == 0){
         printf("\n\n\t\t\tSudoku\n\n\t");
@@ -889,7 +895,33 @@ void jugarSudoku(struct Jugador *jugador){
         //Imprime su felicitacion y el puntaje
         printf("Ganaste");
     }
+
+    //Se cuenta un movimiento
+    movimientos++;
 }
+
+void ganar(struct Jugador *jugador, int movimientos){
+    limpiarPantalla();
+
+    //Generar puntaje
+    jugador->puntaje = ((-log(movimientos) + 10)* 60);
+
+    //Imprime felicitacion
+    printf("\n\t _____                       _       _ \n");
+    printf("\t|  __ \\                     | |     | |\n");
+    printf("\t| |  \\/ __ _ _ __   __ _ ___| |_ ___| |\n");
+    printf("\t| | __ / _` | '_ \\ / _` / __| __/ _ \\ |\n");
+    printf("\t| |_\\ \\ (_| | | | | (_| \\__ \\ ||  __/_|\n");
+    printf("\t\\____/\__,_|_| |_|\\__,_|___/\\__/\___(_)\n");
+
+    printf("\n\tTu puntaje es: %d", jugador->puntaje);
+
+    //vuelve a generar el tablero
+
+    //guarda el progreso del jugador
+    guardarProgreso(jugador);
+    
+    }
 
 int comprobarTablero(struct Jugador *jugador){
     //Varible para saber si el tablero del jugador es correcto
