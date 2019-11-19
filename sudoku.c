@@ -126,6 +126,9 @@ void limpiarProgreso(struct Jugador *jugador);
 //Crea las 81 casillas
 void crearCasillas(struct Jugador *jugador);
 
+//Comprueba si el tablero es correcto y si lo es el jugador gana
+int comprobarTablero(struct Jugador *jugador);
+
 
 /*-------------------------------------------Funcion main-------------------------------------------------------------*/
 int main(){
@@ -731,8 +734,11 @@ void jugarSudoku(struct Jugador *jugador){
     //Estructura para moverse en los submenus
     struct Menu submenu;
 
+    //Variable para saber si el jugador gano
+    int ganar = 0;
+
     //Mientras quiera continuar con el juego
-    while(juego == 1){
+    while(juego == 1 && ganar == 0){
         printf("\n\n\t\t\tSudoku\n\n\t");
         //Imprimir tablero
         //for para iterar en las coordenadas x, y
@@ -872,11 +878,164 @@ void jugarSudoku(struct Jugador *jugador){
 
         //Si se llenaron todas las casillas conprueba si el tablero es correcto
         if(jugador->casillas_llenas == 81 && jugador->movimiento == 'n'){
-            printf("\n\n\tcomprobarTablero()");
+            ganar = comprobarTablero(jugador);
         }
 
         limpiarPantalla();
     }
+
+    //Si el jugador gano
+    if(ganar == 1){
+        //Imprime su felicitacion y el puntaje
+        printf("Ganaste");
+    }
+}
+
+int comprobarTablero(struct Jugador *jugador){
+    //Varible para saber si el tablero del jugador es correcto
+    int ganar = 1;
+    
+    //Arreglo para comprobar si los numeros no se repiten
+    int repetir[9] = {0,0,0,0,0,0,0,0,0};
+
+    //variavle para ir sumando los estados de las casillas
+    int correcto = 0;
+
+    //Contadores para el for
+    int x, y, i, n;
+
+    //Comprobar numero en x
+    for(y=0; y<9; y++){
+        //for para darle valores a x
+        for(x=0; x<9; x++){
+            switch(jugador->progreso[x][y].valor){
+                case 1:
+                    repetir[0] = !repetir[0];
+                    break;
+                case 2:
+                    repetir[1] = !repetir[1];
+                    break;
+                case 3:
+                    repetir[2] = !repetir[2];
+                    break;
+                case 4:
+                    repetir[3] = !repetir[3];
+                    break;
+                case 5:
+                    repetir[4] = !repetir[4];
+                    break;
+                case 6:
+                    repetir[5] = !repetir[5];
+                    break;
+                case 7:
+                    repetir[6] = !repetir[6];
+                    break;
+                case 8:
+                    repetir[7] = !repetir[7];
+                    break;
+                case 9:
+                    repetir[8] = !repetir[8];
+                    break;
+            }
+            //Despues de comprobar cada fila se suman los estados
+            for(i=0; i<9; i++){
+                correcto += repetir[i];
+                //Se devuelve o 0
+                repetir[i] = 0;
+            }
+        }
+    }
+
+    //Comprobar numero en y
+    for(x=0; x<9; x++){
+        //for para darle valores a x
+        for(y=0; y<9; y++){
+            switch(jugador->progreso[x][y].valor){
+                case 1:
+                    repetir[0] = !repetir[0];
+                    break;
+                case 2:
+                    repetir[1] = !repetir[1];
+                    break;
+                case 3:
+                    repetir[2] = !repetir[2];
+                    break;
+                case 4:
+                    repetir[3] = !repetir[3];
+                    break;
+                case 5:
+                    repetir[4] = !repetir[4];
+                    break;
+                case 6:
+                    repetir[5] = !repetir[5];
+                    break;
+                case 7:
+                    repetir[6] = !repetir[6];
+                    break;
+                case 8:
+                    repetir[7] = !repetir[7];
+                    break;
+                case 9:
+                    repetir[8] = !repetir[8];
+                    break;
+            }
+            //Despues de comprobar cada fila se suman los estados
+            for(i=0; i<9; i++){
+                correcto += repetir[i];
+                //Se devuelve o 0
+                repetir[i] = 0;
+            }
+        }
+    }
+
+    //Comprobar cuadrados de 9x9
+    for(n=0; n<9; n+=3){
+        for(y=n; y<n+3; y++){
+            for(x=n; x<n+3; x++){
+                switch(jugador->progreso[x][y].valor){
+                    case 1:
+                        repetir[0] = !repetir[0];
+                        break;
+                    case 2:
+                        repetir[1] = !repetir[1];
+                        break;
+                    case 3:
+                        repetir[2] = !repetir[2];
+                        break;
+                    case 4:
+                        repetir[3] = !repetir[3];
+                        break;
+                    case 5:
+                        repetir[4] = !repetir[4];
+                        break;
+                    case 6:
+                        repetir[5] = !repetir[5];
+                        break;
+                    case 7:
+                        repetir[6] = !repetir[6];
+                        break;
+                    case 8:
+                        repetir[7] = !repetir[7];
+                        break;
+                    case 9:
+                        repetir[8] = !repetir[8];
+                        break;
+                }
+            }
+        }
+        //Despues de comprobar cada fila se suman los estados
+        for(i=0; i<9; i++){
+            correcto += repetir[i];
+            //Se devuelve o 0
+            repetir[i] = 0;
+        }
+    }
+
+    if(correcto != 27){
+        ganar = 0;
+    }
+
+    return ganar;
 }
 
 void limpiarProgreso(struct Jugador *jugador){
