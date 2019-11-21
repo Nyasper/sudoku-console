@@ -2,7 +2,7 @@
 #include <string.h>
 #include <math.h>
 #include <windows.h>
-#include <stdlib.h>>
+#include <stdlib.h>
 
 //Teclas para moverse en los menus y en el tablero de juego
 #define ENTER 13
