@@ -74,6 +74,8 @@ struct Menu{
     int enter;
 };
 
+void instrucciones ();
+
 /*Funciones de menus, impresion y sistema de usuarios*/
 
 //Imprime un menu y regresa la opcion del jugador, usa el nombre del juagdor para imprimirlo en la parte de arriba
@@ -142,7 +144,7 @@ int comprobarTablero(struct Jugador *jugador);
 void ganar(struct Jugador *jugador, int movimientos);
 
 //Revuelve un arreglo con numeros del 1 al 9
-void revolver(int *numeros_desordenados);
+int* revolver(int *numeros_desordenados, int t);
 
 //Desplaza n posiciones a la derecha
 int *desplazar(int *Arreglo, int desplazar);
@@ -190,7 +192,7 @@ int main(){
                     printf("\tLista de puntajes\n");
                     break;
                 case 3: //Corresponde a ver las instrucciones
-                    printf("\tInstrucciones\n");
+                    instrucciones();
                     break;
                 case 4: //Corresponde a ver las instrucciones
                     printf("\tSesion cerrada\n");
@@ -581,6 +583,8 @@ void crearCuenta(){
 
                 Nuevo.movimiento = '0';
 
+                Nuevo.casillas_llenas = 27;
+
                 //Se escriben los datos del usuario en el archivo
                 fwrite(&Nuevo, sizeof(struct Jugador), 1, NuevoUsuario);
                 //se cierra el archivo
@@ -771,13 +775,22 @@ void jugarSudoku(struct Jugador *jugador){
             for(x=0; x<9; x++){
                 if(x == posicionJugador.x && y == posicionJugador.y){
                     //Imprime el caracter correspondiente a la coordenada x, y
-                    printf(" %c %c", 254, jugador->progreso[x][y].imprimir);
+                    if(jugador->progreso[x][y].modificable == 1){
+                        printf(" %c %c", 254, jugador->progreso[x][y].imprimir);
+                    }else{
+                        printf("-%c-%c", 254, jugador->progreso[x][y].imprimir);
+                    }
+                    
                 }else{
                     //Imprime el caracter correspondiente a la coordenada x, y
                     if(jugador->progreso[x][y].valor == 0){
                         printf("   %c", jugador->progreso[x][y].imprimir);
                     }else{
-                        printf(" %d %c",jugador->progreso[x][y].valor ,jugador->progreso[x][y].imprimir);
+                        if(jugador->progreso[x][y].modificable == 1){
+                            printf(" %d %c",jugador->progreso[x][y].valor ,jugador->progreso[x][y].imprimir);
+                        }else{
+                            printf("-%d-%c",jugador->progreso[x][y].valor ,jugador->progreso[x][y].imprimir);
+                        }
                     }
                 }
                 
@@ -910,8 +923,9 @@ void jugarSudoku(struct Jugador *jugador){
         }
 
         //Si se llenaron todas las casillas conprueba si el tablero es correcto
-        if(jugador->casillas_llenas == 81 && jugador->movimiento == 'n'){
+        if(jugador->casillas_llenas >= 80 && jugador->movimiento == 'n'){
             ganar = comprobarTablero(jugador);
+            printf("\tComprobar Si gano");
         }
 
         limpiarPantalla();
@@ -925,6 +939,8 @@ void jugarSudoku(struct Jugador *jugador){
 
     //Se cuenta un movimiento
     movimientos++;
+
+    printf("\n%d", jugador->casillas_llenas);
 }
 
 void ganar(struct Jugador *jugador, int movimientos){
@@ -1294,56 +1310,111 @@ void crearCasillas(struct Jugador *jugador){
 void crearTablero(struct Jugador *jugador){
     //Punteros para almacenar los numeros del 1 al 9
     int *numeros = malloc(sizeof(int) * 9);
-    int *n_numeros = malloc(sizeof(int) * 9);
-    
-    revolver(numeros);
 
-    int i;
-    for(i=0; i<9; i++){
-        n_numeros[i] = numeros[i];
-    }
+    // //Matrices para guardar los cuadrados de 3x3 resueltos
+    // int i;
+
+    // int **a = (int **) malloc(sizeof(int *) * 3);
+    // for(i=0; i<3, i++){
+    //     a[i] = malloc(sizeof(int) * 3)
+    // }
+    // int **b = (int **) malloc(sizeof(int *) * 3);
+    // for(i=0; i<3, i++){
+    //     b[i] = malloc(sizeof(int) * 3)
+    // }
+    // int **c = (int **) malloc(sizeof(int *) * 3);
+    // for(i=0; i<3, i++){
+    //     c[i] = malloc(sizeof(int) * 3)
+    // }
     
+    numeros = revolver(numeros, 9);
+
     //Contadores para el for
-    int x, y;
-    for(y=0; y<3; y++){
+    int x, y;//, contA = 0, contB = 0, contC = 0;
+    for(y=3; y<6; y++){
         for(x=0; x<9; x++){
-            jugador->progreso[x][y].valor = numeros[x];
+            jugador->progreso[x][y].valor = numeros[x] + 1;
             jugador->progreso[x][y].modificable = 0;
+
+            // if(y < 3){\
+            //     a[y][cont] = numeros[x];
+            //     contA++;
+            // }else{
+            //     if(y < 6){
+            //         b[y][cont] = numeros[x];
+            //         contB++;
+            //     }else{
+            //         c[y][cont] = numeros[x];
+            //         contC++;
+            //     }
+                
+            // }
         }
         numeros = desplazar(numeros, 3);
     }
+
+    // int *p = malloc(sizeof(int) * 9);
+    // p = revolver(p, 9);
+
+    // int *q = malloc(sizeof(int) * 9);
+    // q = revolver(q, 9);
+
+    // int *w = malloc(sizeof(int) * 9);
+    // w = revolver(w, 9);
+
+    // //quitar pista
+    // for(y=3; y<6; y++){
+    //     for(x=0; x<3; x++){
+    //         if(y == 3){
+    //             jugador->progreso[p[x]][y].valor = 0;
+    //             jugador->progreso[p[x]][y].modificable = 1;
+    //         }
+
+    //         if(y == 4){
+    //             jugador->progreso[q[x]][y].valor = 0;
+    //             jugador->progreso[q[x]][y].modificable = 1;
+    //         }
+
+    //         if(y == 5){
+    //             jugador->progreso[w[x]][y].valor = 0;
+    //             jugador->progreso[w[x]][y].modificable = 1;
+    //         }
+            
+    //     }
+    // }
     
 }
 
-void revolver(int *numeros_desordenados){
+
+int* revolver(int *numeros_desordenados, int t){
     //Genera la semilla para el nuemro aleatorio
     srand(time(NULL));
 
     //Numero del 1 al 9
-    int numeros[9];
+    int numeros[t];
     //Variable para saber si un indice ya se uso
-    int usado[9];
+    int usado[t];
     //Arreglo para guardar los numeros desordenados
     // int numeros_desordenados[9];
 
     //Contador para el for
     int i;
     //Inicializar los indices en NO usados (0)
-    for (i=0; i < 9; i++){
+    for (i=0; i < t; i++){
         usado[i] = 0;
     }
 
     //Generar los numeros del 1 al 9
-    for (i=0; i < 9; i++){
-        numeros[i] = (i+1);
+    for (i=0; i < t; i++){
+        numeros[i] = i;
     }
 
     //Varubale para almacenar un indice aleatorio
     int index=0;
-    for (i=0; i < 9; i++){
+    for (i=0; i < t; i++){
         //Generar un numero aleatorio hasta que salga una posicion que no este en uso
         do{
-            index = (rand() % 9);
+            index = (rand() % t);
         }while (usado[index]);
 
         //Asignar esa posicion a numeros aleatorios
@@ -1351,6 +1422,8 @@ void revolver(int *numeros_desordenados){
         //posicion usada
         usado[index] = 1;
     }
+
+    return numeros_desordenados;
 }
 
 int *desplazar(int *Arreglo, int desplazar){
@@ -1366,4 +1439,22 @@ int *desplazar(int *Arreglo, int desplazar){
     }
 
     return Arreglo;
+}
+
+void instrucciones(){
+    printf("\n\tINSTRUCCIONES\n");
+    printf("Este juego esta compuesto por una cuadricula de 9x9 casillas, dividida en regiones de 3x3 casillas.\nPartiendo de algunos numeros ya dispuestos en algunas de las casillas, hay que completar las casillas vacias con digitos\ndel 1 al 9 sin que se repitan por fila, columna o region.\n\n");
+    printf("Regla 1: hay que completar las casillas vacias con un solo numero del 1 al 9.\n");
+    printf("Regla 2: en una misma fila no puede haber numeros repetidos.\n");
+    printf("Regla 3: en una misma columna no puede haber numeros repetidos.\n");
+    printf("Regla 4: en una misma region no puede haber nueros repetidos.\n");
+
+    printf("\n\tINSTRUCCIONES DE MANDOS\n");
+    printf("Usa las flecas del teclado para desplazarte.\n");
+    printf("Usa enter para seleccionar.\n");
+    printf("Rellena el sudoku con los numeros del teclado numerico.\n");
+
+    getch();
+
+    limpiarPantalla();
 }
