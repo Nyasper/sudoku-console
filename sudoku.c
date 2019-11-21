@@ -141,6 +141,12 @@ int comprobarTablero(struct Jugador *jugador);
 //Imprime una felicitacion, genera el puntaje y lo guarda
 void ganar(struct Jugador *jugador, int movimientos);
 
+//Revuelve un arreglo con numeros del 1 al 9
+void revolver(int *numeros_desordenados);
+
+//Desplaza n posiciones a la derecha
+int *desplazar(int *Arreglo, int desplazar);
+
 /*-------------------------------------------Funcion main-------------------------------------------------------------*/
 int main(){
     //Variable para guardar la opcion del jugador
@@ -673,21 +679,21 @@ void _quitarDn(struct Jugador *Nuevo){
     //Quita el \n en el nombre
     for(i=0; i<10; i++){
         if(Nuevo->nombre[i] == '\n'){
-            Nuevo->nombre[i] = NULL;
+            Nuevo->nombre[i] = '\0';
         }
     }
 
     //Quita el \n en el usuario
     for(i=0; i<10; i++){
         if(Nuevo->usuario[i] == '\n'){
-            Nuevo->usuario[i] = NULL;
+            Nuevo->usuario[i] = '\0';
         }
     }
     
     //Quita el \n en la contrasena
     for(i=0; i<10; i++){
         if(Nuevo->contrasena[i] == '\n'){
-            Nuevo->contrasena[i] = NULL;
+            Nuevo->contrasena[i] = '\0';
         }
     }
 }
@@ -1267,4 +1273,57 @@ void crearCasillas(struct Jugador *jugador){
 
 void crearTablero(struct Jugador *jugador){
     
+}
+
+void revolver(int *numeros_desordenados){
+    //Genera la semilla para el nuemro aleatorio
+    srand(time(NULL));
+
+    //Numero del 1 al 9
+    int numeros[9];
+    //Variable para saber si un indice ya se uso
+    int usado[9];
+    //Arreglo para guardar los numeros desordenados
+    // int numeros_desordenados[9];
+
+    //Contador para el for
+    int i;
+    //Inicializar los indices en NO usados (0)
+    for (i=0; i < 9; i++){
+        usado[i] = 0;
+    }
+
+    //Generar los numeros del 1 al 9
+    for (i=0; i < 9; i++){
+        numeros[i] = (i+1);
+    }
+
+    //Varubale para almacenar un indice aleatorio
+    int index=0;
+    for (i=0; i < 9; i++){
+        //Generar un numero aleatorio hasta que salga una posicion que no este en uso
+        do{
+            index = (rand() % 9);
+        }while (usado[index]);
+
+        //Asignar esa posicion a numeros aleatorios
+        numeros_desordenados[i] = numeros[index];
+        //posicion usada
+        usado[index] = 1;
+    }
+}
+
+int *desplazar(int *Arreglo, int desplazar){
+
+    int i, almacear, j;
+    for(i=0; i<desplazar; i++){
+        //Almacena el ultimo elemento
+        almacear = Arreglo[9-1];
+        for(j=9 -1 ; j>=0; j--){
+            Arreglo[j] = Arreglo[j-1];
+        }
+        Arreglo[0] = almacear;
+    }
+
+    return Arreglo;
 }
