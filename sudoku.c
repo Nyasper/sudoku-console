@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <windows.h>
+#include <stdlib.h>>
 
 //Teclas para moverse en los menus y en el tablero de juego
 #define ENTER 13
@@ -98,6 +100,9 @@ int menu_IntentarDeNuevo(int error);
 
 //Captura el input del usuario y regresa una opcion
 struct Menu mover(int posicion, int inicio, int final);
+
+//Menu para seleccionar entre si o no
+void menu_SiONo(struct Menu *menu, int imprimir);
 
 //Limpia la consola
 void limpiarPantalla();
@@ -915,7 +920,7 @@ void ganar(struct Jugador *jugador, int movimientos){
     printf("\t| |  \\/ __ _ _ __   __ _ ___| |_ ___| |\n");
     printf("\t| | __ / _` | '_ \\ / _` / __| __/ _ \\ |\n");
     printf("\t| |_\\ \\ (_| | | | | (_| \\__ \\ ||  __/_|\n");
-    printf("\t\\____/\__,_|_| |_|\\__,_|___/\\__/\___(_)\n");
+    printf("\t\\____/\\__,_|_| |_|\\__,_|___/\\__/\\___(_)\n");
 
     printf("\n\tTu puntaje es: %d", jugador->puntaje);
 
