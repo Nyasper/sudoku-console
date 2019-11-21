@@ -570,8 +570,11 @@ void crearCuenta(){
                 Nuevo.puntaje = 0;
                 Nuevo.sesion = 0;
 
-                //Se crea su tablero como vacio
+                //Se crean las casillas del tablero
                 crearCasillas(&Nuevo);
+
+                //Se crea un tablero jugable
+                crearTablero(&Nuevo);
 
                 //Las casillas llenas son igual a 0 + el numero de casillas con un valor inmodificable
                 Nuevo.casillas_llenas = 0;
@@ -619,9 +622,11 @@ void _crearRuta(struct Jugador *Nuevo){
     //Extencion en la que se va a guardar los datos del usuario
     char db[3] = ".db";
 
-    // //Limpiar la basura dentro de la ruta
-    // int i;
-    // for(i=0; i<25; i++)
+    //Limpiar la basura dentro de la ruta
+    int i;
+    for(i=0; i<25; i++){
+        Nuevo->ruta[i] = '\0';
+    }
 
     //Concatena el nuevo usuario con su exencion de archivo en la capeta donde se va a guardar
     strcat(Nuevo->ruta, carpeta);
@@ -827,12 +832,12 @@ void jugarSudoku(struct Jugador *jugador){
         jugador->movimiento = 'm';
 
         //Si se presiona algun numero cambia el valor de la casilla
-        if(posicionJugador.numero != 0 && posicionJugador.y != 9){
+        if(posicionJugador.numero != 0 && posicionJugador.y != 9 && jugador->progreso[posicionJugador.x][posicionJugador.y].modificable == 1){
             //Se suma el contador de casillas llenadas si la posicion vale 0
             if(jugador->progreso[posicionJugador.x][posicionJugador.y].valor == 0){
                 jugador->casillas_llenas++;
             }
-
+        
             jugador->progreso[posicionJugador.x][posicionJugador.y].valor = posicionJugador.numero;
 
             //Cambia el ultimo movimiento a 'n'
@@ -892,8 +897,16 @@ void jugarSudoku(struct Jugador *jugador){
 
         //Si se presiono enter seleccionando la opcion de nuevo
         if(posicionJugador.input == ENTER && posicionJugador.y == 9 && posicionJugador.x_menu == 3){
-            //Se termina el juego
-            juego = 0;
+            //Menu para confirmar si el jugador quiere limpiar su progreso
+            menu_SiONo(&submenu, 3);
+
+            //Si el jugador dice que si, se limpia su progreso
+            if(submenu.posicion == 1){
+                crearCasillas(jugador);
+                crearTablero(jugador);
+                movimientos = 0;
+            }
+
         }
 
         //Si se llenaron todas las casillas conprueba si el tablero es correcto
@@ -1093,8 +1106,10 @@ void limpiarProgreso(struct Jugador *jugador){
         //for para darle valores a x
         for(x=0; x<9; x++){
             if(jugador->progreso[x][y].modificable == 1){
-                //Le da un valor vacio a la casilla
-                jugador->progreso[x][y].valor = 0;
+                if(jugador->progreso[x][y].modificable == 1){
+                    //Le da un valor vacio a la casilla
+                    jugador->progreso[x][y].valor = 0;
+                }             
             }
         }
     }
@@ -1112,6 +1127,11 @@ void menu_SiONo(struct Menu *menu, int imprimir){
             
             case 2:
                 printf("\n\n\t%cQuieres limpiar tu progreso?", 168);   
+                break;
+
+            case 3:
+                limpiarPantalla();
+                printf("\n\n\t%cQuieres crear un tablero nuevo?", 168);   
                 break;
         }
 
@@ -1272,6 +1292,26 @@ void crearCasillas(struct Jugador *jugador){
 }
 
 void crearTablero(struct Jugador *jugador){
+    //Punteros para almacenar los numeros del 1 al 9
+    int *numeros = malloc(sizeof(int) * 9);
+    int *n_numeros = malloc(sizeof(int) * 9);
+    
+    revolver(numeros);
+
+    int i;
+    for(i=0; i<9; i++){
+        n_numeros[i] = numeros[i];
+    }
+    
+    //Contadores para el for
+    int x, y;
+    for(y=0; y<3; y++){
+        for(x=0; x<9; x++){
+            jugador->progreso[x][y].valor = numeros[x];
+            jugador->progreso[x][y].modificable = 0;
+        }
+        numeros = desplazar(numeros, 3);
+    }
     
 }
 
